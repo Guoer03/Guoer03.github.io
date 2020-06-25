@@ -1,318 +1,107 @@
-<!DOCTYPE html>
-<html lang="java">
+extends includes/layout.pug
 
+block top_img
+  - var top_img = page.top_img || theme.post_meta.top_img || theme.top_img || config.top_img
+  if (top_img && page.top_img !== false)
+    - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+    - var flag = top_img === true ? 'no-bg' : ''
+    div#top-container(style=bg_img class=flag)
+      include ./includes/header.pug
+      #post-info
+        #post-title= page.title || _p('no_title')
+        #post-meta
+          if (theme.post_meta.date_type)
+            if (theme.post_meta.date_type === 'both')
+              time.post-meta__date
+                i.fa.fa-calendar(aria-hidden="true")
+                =' '+_p('post.created')+' '+date(page.date, config.date_format)
+                span.post-meta__separator |
+                i.fa.fa-calendar-check-o(aria-hidden="true")
+                =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+            else
+              - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+              time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+          if (theme.post_meta.categories && page.categories.data.length > 0)
+            if (theme.post_meta.date_type)
+              span.post-meta__separator |
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                 i.fa.fa-angle-right(aria-hidden="true")
+          if (theme.disqus.enable && theme.disqus.count)
+            if (theme.post_meta.date_type || theme.post_meta.categories && page.categories.data.length > 0)
+              span.post-meta__separator |
+            i.fa.fa-comment-o.post-meta__icon(aria-hidden="true")
+            a(href=url_for(page.path) + '#disqus_thread')
+              span.disqus-comment-count(data-disqus-identifier=page.path)
+          if (theme.wordcount && theme.wordcount.enable)
+            .post-meta-wordcount
+              span= _p('post.wordcount') + ': '
+              span.word-count= wordcount(page.content)
+              span.post-meta__separator |
+              span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+  else
+    div#top-container.plain
+      include ./includes/header.pug
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>
-    设计模式 | Guoer03的学习笔记
-  </title>
-  <meta name="description" content="java后端，人工智能">
-  
-  <meta name="keywords" content="
-  
-  ">
-  
-  <meta name="author" content="Arthur Ming">
-
-  <meta http-equiv="Cache-Control" content="no-transform"/>
-  <meta http-equiv="Cache-Control" content="no-siteapp">
-  <meta name="theme-color" content="#1e2327">
-  <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://github.githubassets.com/apple-touch-icon-180x180.png">
-
-  <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet"
-        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  
-
-  
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-<meta name="generator" content="Hexo 4.2.1"></head>
-
-<body id="replica-app">
-
-<nav class="navbar-wrapper">
-  <div class="navbar">
-    <div class="container clearfix">
-      <a href="/" class="navbar-logo"><i class="fa fa-github"></i></a>
-
-      <div class="navbar-search float-left desktop-only">
-        <div class="navbar-search-form">
-          <label for="gsc-i-id1">This website</label>
-          <div id="google-search">
-            <gcse:search></gcse:search>
-          </div>
-        </div>
-      </div>
-
-      <ul class="navbar-nav float-left">
-        
-        <li><a href="/archives">Archives</a></li>
-        
-        
-        <li><a href="/categories">Categories</a></li>
-        
-        
-        <li><a href="/tags">Tags</a></li>
-        
-        
-        <li class="desktop-only"><a href="/atom.xml" target="_blank">RSS</a></li>
-        
-      </ul>
-
-      <ul class="navbar-nav user-nav float-right desktop-only">
-        <li class="user-nav-notification">
-          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
-        </li>
-        <li>
-          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
-        </li>
-        <li class="user-nav-logo">
-          <a><img src="/images/header.jpg"> <i class="fa fa-caret-down"></i></i></a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<div class="main-container">
-  <header class="header-wrapper desktop-only">
-  <div class="container header-site-detail">
-    <ul class="header-toolbar">
-      <li class="clearfix">
-        <a href="/archives" class="header-toolbar-left"><i
-                  class="fa fa-file-text"></i> Posts </a>
-        <a href="/archives"
-           class="header-toolbar-right"> 1 </a>
-      </li>
-      <li>
-        <a href="/tags" class="header-toolbar-left"><i
-                  class="fa fa-tags"></i> Tags </a>
-        <a href="/tags"
-           class="header-toolbar-right"> 0 </a>
-      </li>
-      <li>
-        <a href="/categories" class="header-toolbar-left"><i
-                  class="fa fa-folder-open"></i> Categories </a>
-        <a href="/categories"
-           class="header-toolbar-right"> 0 </a>
-      </li>
-    </ul>
-    <h2 class="header-title">
-      <i class="fa fa-book text-muted"></i>
-      <a href="/">Guoer03的学习笔记</a>
-      
-      
-    </h2>
-  </div>
-
-  <div class="container">
-    <div class="header-tab-wrapper clearfix">
-      <span class="header-tab header-tab-selected"><i class="fa fa-thumbs-o-up"></i> Like</span>
-      <span class="header-tab"><i class="fa fa-share-alt"></i> Share</span>
-      <span class="header-tab"><i class="fa fa-comments-o"></i> Discussion</span>
-      <span class="header-tab"><i class="fa fa-bookmark-o"></i> Bookmark </span>
-      <span class="header-tab"><i class="fa fa-smile-o"></i> Smile <i class="fa fa-caret-down"></i></span>
-    </div>
-  </div>
-</header>
-
-
-<div class="post-container container">
-  <h3>
-    <i class="fa fa-user-o"></i>
-    Arthur Ming
-
-    <span class="post-date float-right" title="{{moment(1593066965469).format('MMM DD, YYYY, h:mm:ss A')}}">
-      
-          <i class="fa fa-pencil-square-o"></i>
-      
-      {{moment(1593066965469).fromNow()}}
-    </span>
-  </h3>
-
-  <article class="post-content">
-    <h1>设计模式</h1>
-    <p>是一套被反复使用的，多数人知晓的，经过分类编目的，代码设计经验的总结。</p>
-<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><h3 id="1-创建型模式："><a href="#1-创建型模式：" class="headerlink" title="1.创建型模式："></a>1.创建型模式：</h3><p>提供了一种在创建对象的同时隐藏创建逻辑的方式，而不是使用new运算符直接实例化对象<br>将对象的创建与使用分离”。<br>这样可以降低系统的耦合度，使用者不需要关注对象的创建细节，对象的创建由相关的工厂来完成。</p>
-<h3 id="2-结构型模式"><a href="#2-结构型模式" class="headerlink" title="2.结构型模式"></a>2.结构型模式</h3><p>描述如何将类或对象按某种更大的布局组成更大的结构<br>分为类结构型模式和对象结构型模式<br>对象结构型模式更加灵活，耦合度低</p>
-<h3 id="3-行为型模式"><a href="#3-行为型模式" class="headerlink" title="3.行为型模式"></a>3.行为型模式</h3><p>描述多个类或对象之间怎样相互协作共同完成单个对象无法单独完成的任务</p>
-<pre><code>分为类行为型模式和对象行为型模式    </code></pre><hr>
-<h2 id="设计模式六大原则"><a href="#设计模式六大原则" class="headerlink" title="设计模式六大原则"></a>设计模式六大原则</h2><h3 id="1-开闭原则"><a href="#1-开闭原则" class="headerlink" title="1.开闭原则"></a>1.开闭原则</h3><p>对扩展开放，对修改关闭</p>
-<h3 id="2-里氏代换原则"><a href="#2-里氏代换原则" class="headerlink" title="2.里氏代换原则"></a>2.里氏代换原则</h3><p>在运用里氏代换原则时应将父类设计为抽象类或者接口，     让子类继承或者实现父类的方法。这样方便对代码扩展，更好地实现开闭原则。</p>
-<h3 id="3-依赖倒装原则"><a href="#3-依赖倒装原则" class="headerlink" title="3.依赖倒装原则"></a>3.依赖倒装原则</h3><p>针对接口编程，依赖于抽象而不依赖于具体</p>
-<h3 id="4-接口隔离原则"><a href="#4-接口隔离原则" class="headerlink" title="4.接口隔离原则"></a>4.接口隔离原则</h3><p>使用多个隔离的接口，比使用单个接口好，降低类之间的耦合度<br>当一个接口太大时，我们需要将它分割成一些更细小的接口。</p>
-<h3 id="5-迪米特原则，最少知道原则"><a href="#5-迪米特原则，最少知道原则" class="headerlink" title="5.迪米特原则，最少知道原则"></a>5.迪米特原则，最少知道原则</h3><p>一个实体应当尽量少地与其他实体之间发生相互作用，使得系统模块相对独立</p>
-<h3 id="6-合成复用原则"><a href="#6-合成复用原则" class="headerlink" title="6.合成复用原则"></a>6.合成复用原则</h3><p>尽量使用合成/聚合的方式，而不是使用继承<br>这里聚合/合成的方式主要采用依赖注入;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;依赖注入</span><br><span class="line">public class Human&#123;</span><br><span class="line">    ......</span><br><span class="line">    Father father;</span><br><span class="line">    .....</span><br><span class="line">    public Human(Father father)&#123;</span><br><span class="line">        this.father&#x3D;father;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;或者用setter函数设置</span><br><span class="line">    puublic setFather(Father father)&#123;</span><br><span class="line">        this.father&#x3D;father;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="7-单一职责原则"><a href="#7-单一职责原则" class="headerlink" title="7.单一职责原则"></a>7.单一职责原则</h3><pre><code>一个类只负责一个功能领域的相应职责</code></pre><p>一个类承担的职责越多，被复用的可能性就越小</p>
-<hr>
-<h2 id="一些重要的设计模式："><a href="#一些重要的设计模式：" class="headerlink" title="一些重要的设计模式："></a>一些重要的设计模式：</h2><h3 id="简单工厂模式"><a href="#简单工厂模式" class="headerlink" title="简单工厂模式"></a>简单工厂模式</h3><p>定义一个工厂类，==可根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。创建实例的方法是静态方法，因此简单工厂模式又被称为==静态工厂方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象产品类</span><br><span class="line">public abstract class Product_s &#123;</span><br><span class="line">    public void openAndOn()&#123;&#x2F;&#x2F;每个设备都能够打开而且质保都是三年，每个产品的公共方法</span><br><span class="line">        System.out.println(&quot;该设备能够正常开机关机，质保3年&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;每个具体产品要覆盖重写的方法</span><br><span class="line">    public abstract void productMethod();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;具体产品phone</span><br><span class="line">public class phone extends Product_s&#123;</span><br><span class="line">    @Override&#x2F;&#x2F;重写抽象夫类中的具体产品的方</span><br><span class="line">    public void productMethod() &#123;</span><br><span class="line">        System.out.println(&quot;打电话&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;具体产品Cs</span><br><span class="line">public class Cs extends Product_s &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void productMethod() &#123;</span><br><span class="line">        System.out.println(&quot;上网&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;简单工厂类</span><br><span class="line">public class Factory_Simple &#123;</span><br><span class="line">    &#x2F;&#x2F;由于使用静态方法创建实例，所以又叫该模式为静态工厂模式</span><br><span class="line">    public static Product_s getProduct(String jud)&#123;</span><br><span class="line">        if(jud.equalsIgnoreCase(&quot;phone&quot;))&#123;</span><br><span class="line">            return new phone();&#x2F;&#x2F;如果传入的参数是phone，返回一个phone实例</span><br><span class="line">        &#125;</span><br><span class="line">        else if (jud.equalsIgnoreCase(&quot;Cs&quot;))&#123;</span><br><span class="line">            return new Cs();&#x2F;&#x2F;如果传入的参数是Cs，返回一个Cs实例</span><br><span class="line">        &#125;</span><br><span class="line">        else return null;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class simple &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Factory_Simple factory_simple&#x3D;new Factory_Simple();</span><br><span class="line">        Product_s P&#x3D; factory_simple.getProduct(&quot;phone&quot;);</span><br><span class="line">        P.openAndOn();&#x2F;&#x2F;该设备能够正常开机关机，质保三年</span><br><span class="line">        P.productMethod();&#x2F;&#x2F;打电话</span><br><span class="line">        Product_s s&#x3D;factory_simple.getProduct(&quot;Cs&quot;);</span><br><span class="line">        s.openAndOn();&#x2F;&#x2F;该设备能够正常开机关机，质保三年</span><br><span class="line">        s.productMethod();&#x2F;&#x2F;上网</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>简单工厂类的优点：<br>1.实现了<strong>对象创建和使用的分离</strong><br>2.<strong>使用时无需知道所创建的具体产品类的类名</strong><br>缺点：系统扩展困难，==添加了新产品就要修改工厂逻辑。将违背“开闭原则”==。<br>使用了静态工厂方法，工厂角色无法形成基于继承的等级结构。</p>
-<hr>
-<h3 id="抽象方法模式"><a href="#抽象方法模式" class="headerlink" title="抽象方法模式"></a>抽象方法模式</h3><p> 提供一个创建一系列相关或相互依赖对象的接口，抽象工厂中的每个具体工厂不只是创建一种产品，其负责创建一族产品。</p>
-<p> 抽象产品以及具体产品：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象产品</span><br><span class="line">public interface Button &#123;</span><br><span class="line">    &#x2F;&#x2F;按钮接口</span><br><span class="line">    void display();</span><br><span class="line">&#125;</span><br><span class="line">public interface Combox &#123;</span><br><span class="line">    &#x2F;&#x2F;组合框</span><br><span class="line">    void display();</span><br><span class="line">&#125;</span><br><span class="line">public interface TextField &#123;</span><br><span class="line">    &#x2F;&#x2F;文本框</span><br><span class="line">    void display();</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;Spring的具体产品</span><br><span class="line">public class SpringButton implements Button &#123;&#x2F;&#x2F;Spring按钮的具体产品</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示绿色按钮&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class SpringCombox implements Combox &#123;&#x2F;&#x2F;Spring组合框的具体产品</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示绿色组合框&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class SprinTextField implements TextField &#123;&#x2F;&#x2F;&#x2F;&#x2F;Spring文本框的具体产品</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示绿色文本框&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;Summer的具体产品</span><br><span class="line">public class SummerButton implements Button &#123;&#x2F;&#x2F;Summer按钮的具体产品</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示蓝色按钮&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class SummerCombox implements Combox &#123;&#x2F;&#x2F;Summer组合框的具体产品</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示蓝色组合框&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class SummerTextField implements TextField &#123;&#x2F;&#x2F;Summer文本框的具体产品</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示蓝色文本框&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>抽象工厂和具体工厂：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象工厂：能够创建一族产品</span><br><span class="line">public interface AbstractFactory &#123;</span><br><span class="line">    public abstract Button CreateButton();</span><br><span class="line">    public abstract Combox CreateCombox();</span><br><span class="line">    public abstract TextField CreateTextField();</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;负责创建Spring产品族的具体工厂</span><br><span class="line">public class ConcreteFactorySpring implements AbstractFactory&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Button CreateButton() &#123;return new SpringButton();&#125;</span><br><span class="line">    @Override</span><br><span class="line">    public Combox CreateCombox() &#123;return new SpringCombox();&#125;</span><br><span class="line">    @Override</span><br><span class="line">    public TextField CreateTextField() &#123;return new SprinTextField();&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;负责创建Summer产品族的具体工厂</span><br><span class="line">public class ConcreteFactorySummer implements AbstractFactory&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Button CreateButton() &#123;return new SummerButton();&#125;</span><br><span class="line">    @Override</span><br><span class="line">    public Combox CreateCombox() &#123;return new SummerCombox();&#125;</span><br><span class="line">    @Override</span><br><span class="line">    public TextField CreateTextField() &#123;return new SummerTextField();&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>新产品的方法<br><strong>优点：</strong><br>1.隔离了具体类的生成。<br>2.保证客户端始终只使用同一个产品族的对象。<br>3.增加新的产品族很方便，符合“开闭原则”。<br><strong>缺点：</strong><br>增加新的等级结构非常麻烦<br><strong>适用场景</strong><br>有多于一个的产品族，而且每次只是用其中的某一产品族，属于同一个产品族的产品将在一起使用</p>
-<hr>
-<h3 id="工厂方法模式"><a href="#工厂方法模式" class="headerlink" title="工厂方法模式"></a>工厂方法模式</h3><p>工厂方法模式<br>定义一个用于创建对象的接口，让子类决定将哪一个类实例化<br>==对每一个产品，工厂接口中都有一个对应的实现类来创建==，这样就可以省去上面的判断语句，增加了扩展性。</p>
-<p>优点：<br>1.用户只需关心所需产品对应的工厂，无需关心创建细节<br>2.基于工厂角色和产品角色的多态性设计，可以让工厂自主决定创建何种产品对象<br>3.加如新产品时，无须修改抽象工厂和抽象产品提供的接口，无需修改客户端，无需修改其他的具体工厂和具体产品，只要加一个具体工厂和具体产品，修改配置文件就好了。完全符合“开闭原则”<br>缺点：<br>1.<strong>系统中类的个数在添加新产品时会成对增加，导致系统复杂度的提升</strong>。由于更多的类需要编译和运行，系统开销变大。<br>2.加入了抽象工厂，<strong>可能要用到DOM，反射等技术</strong>，增加了系统的实现难度  </p>
-<h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><p>确保对象的唯一性，系统中有时只允许一个对象出现，例如TaskManager ，任务管理器。  </p>
-<p>++不考虑并发环境下的单例模式：++</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class TaskManager &#123;</span><br><span class="line">    private TaskManager()&#123;&#125;;&#x2F;&#x2F;构造方法用private修饰，表示在类外</span><br><span class="line">    private static TaskManager tm&#x3D;null;</span><br><span class="line">    public static TaskManager getTm()&#123;</span><br><span class="line">        if(tm&#x3D;&#x3D;null)&#123;</span><br><span class="line">            return new TaskManager();</span><br><span class="line">        &#125;</span><br><span class="line">        return this.tm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在并发环境下，上述单例模式不能够确保唯一对象，  </p>
-<p>当两个线程同时一起getTm时一起进入if条件后，都会得到一个新对象  </p>
-<p>++并发环境下单例模式的改进：++</p>
-<h5 id="1-饿汉单例模式："><a href="#1-饿汉单例模式：" class="headerlink" title="1.饿汉单例模式："></a>1.饿汉单例模式：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class TaskManager &#123;</span><br><span class="line">    private TaskManager()&#123;&#125;;</span><br><span class="line">    &#x2F;&#x2F;在类加载时就申请一个不可修改的对象，当多个线程并发getTm时，由于类中的静态变量只有</span><br><span class="line">    &#x2F;&#x2F;一份，而且这个对象无法被修改，所以拿到的都是一个对象</span><br><span class="line">    private static final TaskManager tm&#x3D;new TaskManager();</span><br><span class="line">    public static TaskManager getTm()&#123;</span><br><span class="line">        return tm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="2-懒汉单例模式：双重判断锁定"><a href="#2-懒汉单例模式：双重判断锁定" class="headerlink" title="2.懒汉单例模式：双重判断锁定"></a>2.懒汉单例模式：双重判断锁定</h5><p>当两个线程同时进入if(tm==null)时，如果只有一个锁定，在第一个线程拿到一个对象后，第二个线程并不知道tm！=null了，因为没有判断条件了，所以要再加一次判定。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class TaskManager &#123;</span><br><span class="line">    private TaskManager()&#123;&#125;;</span><br><span class="line">    private volatile static TaskManager tm&#x3D;null;</span><br><span class="line">    &#x2F;&#x2F;被volatile修饰的成员变量能够确保多个线程都能够正常处理，但会使得系统效率降低</span><br><span class="line">    public static TaskManager getTm()&#123;</span><br><span class="line">        if(tm&#x3D;&#x3D;null)&#123;</span><br><span class="line">            synchronized (TaskManager.class) &#123;</span><br><span class="line">                if(tm&#x3D;&#x3D;null)&#123;</span><br><span class="line">                    return new TaskManager();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return tm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-IoDH技术-在单例类中增加一个静态内部类，在该内部类中创键单例对象"><a href="#3-IoDH技术-在单例类中增加一个静态内部类，在该内部类中创键单例对象" class="headerlink" title="3.IoDH技术:在单例类中增加一个静态内部类，在该内部类中创键单例对象"></a>3.IoDH技术:在单例类中增加一个静态内部类，在该内部类中创键单例对象</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class TaskManager &#123;</span><br><span class="line">    private TaskManager()&#123;&#125;;</span><br><span class="line">    public static class holderclass&#123;</span><br><span class="line">        private static final TaskManager tm&#x3D;null;</span><br><span class="line">    &#125;</span><br><span class="line">    public static TaskManager getTm()&#123;</span><br><span class="line">        return holderclass.tm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>不会像饿汉单例一样只要类运行就挂着一个单例对象占空间，内存。同时并发过程中，由于单例对象只有一份，所以每个线程拿到的都是一份单例对象<br><strong>优点：</strong><br>1.由于封装了唯一实例，可以严格控制客户怎样以及何时访问单例对象<br>2.节约系统资源<br>3.允许可变数目的实例，IoDH Holderclass中可以声明有限个对象，变成多例模式<br><strong>缺点：</strong><br>1.扩展非常困难，因为没有抽象<br>2.单例职责过重，真实的单例并不止上面一点，还会有其他的很多方法，单例对象只是其中很小的一部分，单例类既充当了工厂，又充当了产品<br>3.单例对象长时间不使用会被系统回收<br><strong>适用场景</strong><br>1.系统只需要一个单例对象<br>2.客户调用类的单个实例只允许使用一个公共节点，除了该公共节点，不能通过其他途径访问该实例</p>
-<hr>
-<h3 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h3><p>解决不兼容结构的问题。将一个接口转换成客户希望的另一个接口，使接口不兼容的那些类可以一起工作。<br>==注：这个接口是广义的接口，可以表示一个方法或者方法的集合==</p>
-<p>以下用一个例子说明适配器模式：<br>现有一个成绩操作接口，编程人员在实现这个接口的时候需要使用QuickSort类和BinarySearch类。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;成绩操作类接口</span><br><span class="line">public interface ScoreOperation &#123;</span><br><span class="line">    public void sort();</span><br><span class="line">    public void Search();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;BinarySearch类</span><br><span class="line">public class BinarySearch &#123;</span><br><span class="line">    public void binarySearch()&#123;</span><br><span class="line">        System.out.println(&quot;对数组进行二分查找&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;QuickSort类</span><br><span class="line">public class QuickSort &#123;</span><br><span class="line">    public void quickSort()&#123;</span><br><span class="line">        System.out.println(&quot;对数组进行快速排序&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;适配器类，具体的适配者和适配器是关联关系</span><br><span class="line">public class Adapter_S implements ScoreOperation &#123;</span><br><span class="line">    private BinarySearch bs&#x3D;new BinarySearch();</span><br><span class="line">    private QuickSort quickSort&#x3D;new QuickSort();</span><br><span class="line">    @Override</span><br><span class="line">    public  void sort() &#123;</span><br><span class="line">           quickSort.quickSort();</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void Search() &#123;</span><br><span class="line">        bs.binarySearch();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ScoreOperation scoreOperation&#x3D;new Adapter_S();</span><br><span class="line">        scoreOperation.Search();</span><br><span class="line">        scoreOperation.sort();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="装饰模式"><a href="#装饰模式" class="headerlink" title="装饰模式"></a>装饰模式</h3><p>动态的给一个对象增加一些额外的职责。就增加功能来说，装饰器模式相比生成子类更加灵活，装饰类会继承产品类，在具体装饰类实现时，可以新增一些功能。<br>构件类：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象控件类</span><br><span class="line">public abstract class Component &#123;</span><br><span class="line">    public abstract void display();</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;具体控件类</span><br><span class="line">public class Windows extends Component &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        System.out.println(&quot;显示窗体！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>装饰类：  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象装饰类</span><br><span class="line">public abstract class ComponentDecorator extends Component &#123;</span><br><span class="line">    private Component component;</span><br><span class="line">    public ComponentDecorator(Component component) &#123;</span><br><span class="line">        this.component&#x3D;component;</span><br><span class="line">    &#125;</span><br><span class="line">    public void display() &#123;</span><br><span class="line">        component.display();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;具体装饰类</span><br><span class="line">public class BlackBorderDecorator extends ComponentDecorator &#123;</span><br><span class="line">    public BlackBorderDecorator(Component component) &#123;</span><br><span class="line">        super(component);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void display()&#123;</span><br><span class="line">        this.setBorder();</span><br><span class="line">        super.display();</span><br><span class="line">    &#125;</span><br><span class="line">    public void setBorder()&#123;</span><br><span class="line">        System.out.println(&quot;为构建增加黑色边框！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class ScrollBarDecorator extends ComponentDecorator &#123;</span><br><span class="line">    public ScrollBarDecorator(Component component) &#123;</span><br><span class="line">        super(component);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void display()&#123;</span><br><span class="line">        setScrollBar();</span><br><span class="line">        super.display();</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;给产品增加功能</span><br><span class="line">    public void setScrollBar()&#123;</span><br><span class="line">        System.out.println(&quot;给构件增加滑动窗口&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;客户端代码</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Component component&#x3D;new Windows();</span><br><span class="line">    Component component1&#x3D;new BlackBorderDecorator(component);</span><br><span class="line">    Component component2&#x3D;new ScrollBarDecorator(component1);</span><br><span class="line">    component2.display();</span><br><span class="line">&#125;&#x2F;&#x2F;一个构件对象，被增加了两个功能</span><br></pre></td></tr></table></figure>
-<p><strong>要点</strong>：装饰类要继承构件类，在重写构件类运行代码的基础上，加入新功能。<br>优点：<br>装饰类和被装饰类独立发展，不会互相耦合，装饰模式可以动态扩展一个实现类的功能<br><strong>缺点：</strong><br>多层装饰比较复杂<br><strong>适用场景</strong><br>动态扩展一个类的功能  </p>
-<h3 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h3><p>给某一个对象提供一个代理对象，并由代理对象控制对原对象的引用。<br>1.<strong>中介隔离</strong>，如果客户类不能或不想直接引用一个委托对象，就可以使用代理类<br>2.<strong>开闭原则</strong>，增加功能。<br>++和装饰模式的差别:++<br>装饰模式关注在一个对象上动态的添加方法。代理模式可以对它的客户隐藏一个类的所有信息，甚至客户无需去new一个真实对象。而装饰模式需要new真实对象，从而在装饰类中把对象传进去增加功能。<br>代码实例：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;Image接口</span><br><span class="line">public interface Image &#123;</span><br><span class="line">    void copytoDesk(String pathname) throws IOException;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;具体的实现类</span><br><span class="line">public class RealImage implements Image &#123;</span><br><span class="line">    @Override</span><br><span class="line">    &#x2F;&#x2F;重写覆盖负责复制的方法</span><br><span class="line">    public void copytoDesk(String pathname) throws IOException &#123;</span><br><span class="line">        Properties properties&#x3D;new Properties();</span><br><span class="line">        InputStream resourceAsStream &#x3D; RealImage.class.getClassLoader().getResourceAsStream(&quot;pro.properties&quot;);</span><br><span class="line">        properties.load(resourceAsStream);</span><br><span class="line">        String path&#x3D;properties.getProperty(&quot;path&quot;);</span><br><span class="line">        InputStream inputStream&#x3D;new FileInputStream(path);</span><br><span class="line">        byte a[]&#x3D;new byte[10000000];</span><br><span class="line">        int e&#x3D;0;</span><br><span class="line">        while((e&#x3D;inputStream.read(a))!&#x3D;-1)&#123;</span><br><span class="line">            System.out.println(&quot;正在读取中&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        OutputStream outputStream&#x3D;new FileOutputStream(pathname+&quot;\\test.gif&quot;);</span><br><span class="line">        outputStream.write(a);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;代理实现类</span><br><span class="line">public class ImageProxy implements Image &#123;</span><br><span class="line">    private RealImage realImage;</span><br><span class="line">    @Override&#x2F;&#x2F;重写了接口中的方法，其实主要调用具体实现类，然后增加了一些与之相关的操作</span><br><span class="line">    &#x2F;&#x2F;此处其实是在实现类复制文件方法前先创造了一个test文件夹，再把文件复制到该文件夹中</span><br><span class="line">  public void copytoDesk(String pathname) throws IOException &#123;</span><br><span class="line">        if(realImage&#x3D;&#x3D;null)&#123;</span><br><span class="line">        this.realImage&#x3D;new RealImage();&#x2F;&#x2F;此处是和装饰器模式不同的点</span><br><span class="line">        &#x2F;&#x2F;装饰器模式采用依赖注入，代理模式是隐藏了具体实现类的创建</span><br><span class="line">        &#125;</span><br><span class="line">        String path&#x3D;mkdir();</span><br><span class="line">        this.realImage.copytoDesk(path);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;创造一个文件夹的方法</span><br><span class="line">    public String mkdir() throws IOException &#123;</span><br><span class="line">        Properties properties&#x3D;new Properties();</span><br><span class="line">        InputStream resourceAsStream &#x3D; RealImage.class.getClassLoader().getResourceAsStream(&quot;pro.properties&quot;);</span><br><span class="line">        properties.load(resourceAsStream);</span><br><span class="line">        String path&#x3D;properties.getProperty(&quot;path2&quot;)+&quot;test&quot;;</span><br><span class="line">        File f&#x3D;new File(path);</span><br><span class="line">        f.mkdir();</span><br><span class="line">        return path;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>优点：   **<br>职责清晰，高扩展性<br>**缺点：</strong><br>中间增加了代理，可能会使处理速度变慢<br>有些代理模式可能会非常复杂<br><strong>适用场景</strong>   </p>
-<p>==延迟加载==：有些对象初始化要花费很多资源和时间，采用代理模式，在最开始的时候初始化代   理对象替代原有位置，当真正要用到该对象的时候再去调用方法生成一个对象。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">假设某客户端软件，根据用户请求，去数据库查询数据的功能。在数据库查询前需要获得数据库连 接。</span><br><span class="line">在系统启动时，初始化系统所有的类，此时尝试获得数据库连接。</span><br><span class="line">当系统存在大量类似的操作时（XML解析等），所有这些初始化操作都必须叠加，使得系统很慢。</span><br><span class="line">为此，使用代理模式，使用代理类，封装对数据库的查询操作。</span><br><span class="line">当系统启动时，初始化这个代理类，而非真实的数据库查询类，而代理类什么都不做。</span><br><span class="line">当真正开始查询的时候，调用代理对象中的方法，才初始化查询对象。</span><br></pre></td></tr></table></figure>
-<h4 id="动态代理："><a href="#动态代理：" class="headerlink" title="动态代理："></a>动态代理：</h4><h4 id="基于接口的动态代理："><a href="#基于接口的动态代理：" class="headerlink" title="基于接口的动态代理："></a>基于接口的动态代理：</h4><p>Proxy类中的newProxyInstance方法来实现一个接口<br>newProxyInstance方法的参数：<br>==ClassLoader：==和被代理对象使用相同的类加载器<br>==Class[]:==字节码数组，用于使代理对象和被代理对象有相同的方法<br>==invocationHandler:==用于增强的代码，一般都是实现该接口的一个实现类，通常都是匿名内部类。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Producer proxyProducer&#x3D;Proxy.newProxyInstance(producer.getClass().getClassLoader(),producer.getClass().getInterfaces()，</span><br><span class="line">new InvocationHandler()&#123;</span><br><span class="line">    &#x2F;&#x2F;作用：执行被代理对象的任何接口方法都会经过该方法</span><br><span class="line">    &#x2F;&#x2F;该方法中每个参数的含义</span><br><span class="line">    @Override</span><br><span class="line">    public Object invoke(Object proxy,Method method,Objects[] args ) throw Throwable&#123;</span><br><span class="line">        &#x2F;&#x2F;提供增强的代码</span><br><span class="line">        Object returnValue&#x3D;null;</span><br><span class="line">        &#x2F;&#x2F;1.获取方法执行的参数</span><br><span class="line">        Float money&#x3D;(Float)args[0];</span><br><span class="line">        if(&quot;saleProduct&quot;.equals(method.getName()))&#123;</span><br><span class="line">                 returnValue&#x3D;method.invoke(producer,money*0.8f);</span><br><span class="line">        &#125;</span><br><span class="line">        return  returnValue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>如果被代理类未实现任何接口，则无法使用这种方法.<br>基于未实现任何接口的子类的动态代理：<br>先导入依赖：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;cglib&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;cglib&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.1——3&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
-<p>要求：被代理类不能是最终类<br>使用的是Enhancer类中的create方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Enhancer.create(producer.getClass(),new MethodInterceptor()&#123;</span><br><span class="line">     @Override</span><br><span class="line">     public Object intercept(Object proxy,Method method,Object[] args,MethodProxy methodProxy) throw Throwable&#123; &#x2F;&#x2F;提供增强的代码</span><br><span class="line">        Object returnValue&#x3D;null;</span><br><span class="line">        &#x2F;&#x2F;1.获取方法执行的参数</span><br><span class="line">        Float money&#x3D;(Float)args[0];</span><br><span class="line">        if(&quot;saleProduct&quot;.equals(method.getName()))&#123;</span><br><span class="line">                 returnValue&#x3D;method.invoke(producer,money*0.8f);</span><br><span class="line">        &#125;</span><br><span class="line">        return  returnValue;</span><br><span class="line">     &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="责任链模式"><a href="#责任链模式" class="headerlink" title="责任链模式"></a>责任链模式</h3><p>为请求创建了一个接收者对象的链，通常每个接收者都包含另一个接收者的引用。<br>如果一个对象不能处理该请求，那么它会把系统的请求传给下一个接收者。<br>将请求的发送者和请求的处理解耦了。<br>需要一个抽象责任链类，其中<br>1.需要有每一个责任链的级别.<br>2.要有一个设置下一个责任对象的方法.<br>3.设置具体的责任链传递方法<br>4.一个共同完成某个操作的抽象方法。  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象责任对象</span><br><span class="line">public abstract class Abstrctlogger &#123;</span><br><span class="line">    public static int Info&#x3D;1;</span><br><span class="line">    public static int Debug&#x3D;2;</span><br><span class="line">    public static int Error&#x3D;3;&#x2F;&#x2F;每个类别的消息都有等级</span><br><span class="line">    protected int level;</span><br><span class="line">    protected Abstrctlogger nextlogger;&#x2F;&#x2F;每个实现类都要有一个nextlogger这样才能形成链</span><br><span class="line">    public void setnextLogger(Abstrctlogger nextLogger)&#123;</span><br><span class="line">        this.nextlogger&#x3D;nextLogger;</span><br><span class="line">    &#125;&#x2F;&#x2F;用来形成责任链</span><br><span class="line">    public void  logger(int level,String message)&#123;&#x2F;&#x2F;具体的责任传递方法，最先调用方法的是责任链的开头，责任开头的这个对象依赖另一个方法生成</span><br><span class="line">        if(this.level&lt;&#x3D;level)&#123;</span><br><span class="line">            write(message);</span><br><span class="line">        &#125;</span><br><span class="line">        else &#123;</span><br><span class="line">            nextlogger.logger(level, message);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public abstract void write(String message);&#x2F;&#x2F;每个具体的责任链中的对象自己要实现的方法</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;具体的责任对象，不仅要重写抽象类方法，还要写一个构造函数确定自己属于哪个级别</span><br><span class="line">public class ConsoleLooger extends Abstrctlogger &#123;</span><br><span class="line">    public ConsoleLooger(int level) &#123;</span><br><span class="line">        this.level&#x3D;level;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void write(String message) &#123;</span><br><span class="line">        System.out.println(&quot;Standard Console::Looger:&quot;+message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class ErrorLogger extends Abstrctlogger&#123;</span><br><span class="line">    public ErrorLogger(int level) &#123;&#x2F;&#x2F;对于每个具体责任链的类，只需要提供一个构造函数让客户指定在责任链的哪个位置</span><br><span class="line">        this.level&#x3D;level;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void write(String message) &#123;</span><br><span class="line">        System.out.println(&quot;Error Console::Logger:&quot;+message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class FileLogger extends Abstrctlogger &#123;</span><br><span class="line">    public FileLogger(int level) &#123;&#x2F;&#x2F;对于每个具体责任链的类，只需要提供一个构造函数让客户指定在责任链的哪个位置</span><br><span class="line">        this.level&#x3D;level;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void write(String message) &#123;</span><br><span class="line">        System.out.println(&quot;File::Logger:&quot;+message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static Abstrctlogger getLoggerChain()&#123;</span><br><span class="line">    Abstrctlogger abstrctlogger1&#x3D;new ConsoleLooger(Abstrctlogger.Debug);</span><br><span class="line">    Abstrctlogger abstrctlogger2&#x3D;new ErrorLogger(Abstrctlogger.Error);&#x2F;&#x2F;为每个责任链具体对象设置级别</span><br><span class="line">    Abstrctlogger abstrctlogger3&#x3D;new FileLogger(Abstrctlogger.Info);</span><br><span class="line">    abstrctlogger1.setnextLogger(abstrctlogger3);</span><br><span class="line">    abstrctlogger2.setnextLogger(abstrctlogger1);</span><br><span class="line">    return abstrctlogger2;</span><br><span class="line">&#125;&#x2F;&#x2F;为每个责任链具体对象设置级别和之间的顺序，返回责任链的开头对象</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Abstrctlogger abstrctlogger&#x3D;getLoggerChain();</span><br><span class="line">    abstrctlogger.logger(3,&quot;This is an Error&quot;);</span><br><span class="line">    abstrctlogger.logger(2,&quot;This is a Debug&quot;);</span><br><span class="line">    abstrctlogger.logger(1,&quot;This is an information&quot;);</span><br><span class="line">&#125;&#x2F;&#x2F;主函数</span><br></pre></td></tr></table></figure>
-<p><strong>优点：</strong><br>1.降低了耦合度，使得请求的发送者和接收者解耦<br>2.简化了对象。使得对象不知道链的结构<br>3.允许动态地新增或者删除责任<br><strong>缺点：</strong><br>1.不能保证请求一定能被接收<br>2.系统性能受到影响，可能会造成循环调用<br>3.不容易观察运行时的特征<br><strong>适用场景</strong><br>多个对象处理一个请求时，不明确指定接收者时  </p>
-<h3 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h3><p>是一种行为模式：适用于对象间一对多的依赖关系，其中一是观察者，多是观察者，观察者依赖于被观察者  </p>
-<p>实例：很多个第三方天气软件从气象站获取最新的温度。当气象站的温度变化时，第三方天气软件要做到及时更新。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;气象站</span><br><span class="line">public class WeatherStation &#123;</span><br><span class="line">    &#x2F;&#x2F;集合里把所有观察者全部放在一起，一起维护，一起更新</span><br><span class="line">    private List&lt;software&gt; observers&#x3D;new ArrayList&lt;&gt;();</span><br><span class="line">    private int temperature;</span><br><span class="line"></span><br><span class="line">    public int getTemperature() &#123;</span><br><span class="line">        return temperature;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setTemperature(int temperature) &#123;</span><br><span class="line">        this.temperature &#x3D; temperature;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;把观察者注入的方法</span><br><span class="line">    public void attach (software...obs)</span><br><span class="line">    &#123;   for(int i&#x3D;0;i&lt;obs.length;i++)&#123;</span><br><span class="line">            observers.add(obs[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;将观察者全部更新的方法</span><br><span class="line">    public void notifyAllObservers()&#123;</span><br><span class="line">        for (software observer:observers</span><br><span class="line">             ) &#123;</span><br><span class="line">            observer.update();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;抽象观察者类</span><br><span class="line">public abstract class software &#123;</span><br><span class="line">    &#x2F;&#x2F;一定要有气象站，观察者的更新依赖气象站的更新</span><br><span class="line">    protected WeatherStation weatherStation;</span><br><span class="line">    public abstract void update();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;观察者1</span><br><span class="line">public class softwareObserver1 extends software &#123;</span><br><span class="line">    &#x2F;&#x2F;构造方法其实就是把该观察者和被观察者的关系建立起来</span><br><span class="line">    public softwareObserver1(WeatherStation weatherStation) &#123;</span><br><span class="line">        this.weatherStation&#x3D;weatherStation;</span><br><span class="line">        this.weatherStation.attach(this);&#x2F;&#x2F;把该观察者放到气象站的观察者集合中，方便更新</span><br><span class="line">    &#125;</span><br><span class="line">&#x2F;&#x2F;更新方法    </span><br><span class="line">    @Override</span><br><span class="line">    public void update() &#123;</span><br><span class="line">        System.out.println(&quot;墨迹天气，实时温度:&quot;+weatherStation.getTemperature()+&quot;度&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;观察者2</span><br><span class="line">public class softwareObserver2 extends software &#123;</span><br><span class="line">    public softwareObserver2(WeatherStation weatherStation) &#123;</span><br><span class="line">        this.weatherStation&#x3D;weatherStation;</span><br><span class="line">        this.weatherStation.attach(this);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void update() &#123;</span><br><span class="line">        System.out.println(&quot;百度天气，实时温度:&quot;+weatherStation.getTemperature()+&quot;度&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;运行过程</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    WeatherStation ws&#x3D;new WeatherStation();&#x2F;&#x2F;建立关系开始</span><br><span class="line">    software s1&#x3D;new softwareObserver1(ws);</span><br><span class="line">    software s2&#x3D;new softwareObserver2(ws);&#x2F;&#x2F;建立关系完成</span><br><span class="line">    ws.setTemperature(new Random().nextInt(50));&#x2F;&#x2F;改变天气</span><br><span class="line">    ws.notifyAllObservers();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>优点：</strong>                                                                                     </p>
-<p>1.观察者和被观察者是抽象耦合的<br>2.可以把1对多变成一对一，从而建立一套出发链。  </p>
-<p><strong>缺点：</strong>                                                                                </p>
-<p>1.被观察者对象有很多直接的或者间接的观察者时，通知所有观察者会花费很多时间<br>2.可能会造成循环调用<br>3.观察者不知道观测对象的变化过程  </p>
-<h3 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h3><p>算法本身只是一种策略，并且这些算法是随时都可能互相替换的，比如针对同一件商品，今天打八折、明天满100减30，这些策略间是可以互换的。<br>定义了一组算法，将每个算法都封装起来，并且使它们之间可以互换。  </p>
-<p>1.Context上下文角色，包含了所有具体策略或由客户端指定具体是哪个策略，并提供了一个方法来决定使用哪个策略执行，来获取结构。  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;根据客户给的参数来决定调用哪个算法，算是一个调用算法的类，把创建对象的方式</span><br><span class="line">&#x2F;&#x2F;隐藏起来，客户端甚至无需创建对象</span><br><span class="line">public class Context &#123;</span><br><span class="line">    public  Strategy strategy&#x3D;null;</span><br><span class="line">    private static HashMap&lt;String,Strategy&gt; hp&#x3D;new HashMap&lt;&gt;();</span><br><span class="line">    public  Context(String method)&#123;</span><br><span class="line">        this.strategy&#x3D;hp.get(method);</span><br><span class="line">    &#125;</span><br><span class="line">    public static void setStringAndStrategy(String method,Strategy strategy)&#123;</span><br><span class="line">        hp.put(method, strategy);</span><br><span class="line">    &#125;</span><br><span class="line">    public int excute(int num1,int num2)&#123;</span><br><span class="line">        return strategy.doOperation(num1,num2);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Strategy strategy&#x3D;new operationAdd();</span><br><span class="line">        Context.setStringAndStrategy(&quot;add&quot;,strategy);</span><br><span class="line">        Context context&#x3D;new Context(&quot;add&quot;);</span><br><span class="line">        System.out.println(context.excute(7,8));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;改进以后发现，Context中可以随意添加方法，可以随意组合方法。客户端无需再</span><br><span class="line">&#x2F;&#x2F;创建对象</span><br></pre></td></tr></table></figure>
-<p>2.抽象策略接口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface  Strategy &#123;</span><br><span class="line">    public  int doOperation(int num1,int num2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>3.具体策略实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;具体策略：封装算法</span><br><span class="line">public class operationAdd implements Strategy &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public int doOperation(int num1, int num2) &#123;</span><br><span class="line">        return num1+num2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class operationSub implements Strategy&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public int doOperation(int num1, int num2) &#123;</span><br><span class="line">        return num1-num2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class operationMutiplay implements Strategy &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public int doOperation(int num1, int num2) &#123;</span><br><span class="line">        return num1*num2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>*<em>优点：  *</em>                                                                                </p>
-<p>1.算法可以自由切换<br>2.避免使用多重条件判断<br>3.扩展性好  </p>
-<p>*<em>缺点：   *</em>                                                                                   </p>
-<p>策略类会变很多  </p>
-<p>*<em>适用场景  *</em><br>系统或者对象需要动态的在几种算法和行为中选择一种  </p>
-<h3 id="模板方法"><a href="#模板方法" class="headerlink" title="模板方法"></a>模板方法</h3><p>一个抽象类公开定义了执行它的方法的模板。子类可以调用其他的抽象方法，但是模板方法无法重写。  </p>
-<p>模板类：其中模板方法用final修饰</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public abstract class Game &#123;</span><br><span class="line">    abstract void initialize();</span><br><span class="line">    abstract void startPlay();</span><br><span class="line">    abstract void endPlay();</span><br><span class="line">    &#x2F;&#x2F;模板</span><br><span class="line">    public final void play()&#123;</span><br><span class="line">        System.out.println(&quot;开始游戏&quot;);</span><br><span class="line">        &#x2F;&#x2F;初始化游戏</span><br><span class="line">        initialize();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;开始游戏</span><br><span class="line">        startPlay();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;结束游戏</span><br><span class="line">        endPlay();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p>模板类的具体实现：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Football extends Game &#123;</span><br><span class="line">    @Override</span><br><span class="line">    void initialize() &#123;</span><br><span class="line">        System.out.println(&quot;买一个足球&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    void startPlay() &#123;</span><br><span class="line">        System.out.println(&quot;开始踢足球&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    void endPlay() &#123;</span><br><span class="line">        System.out.println(&quot;结束踢足球&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Basketball extends Game &#123;</span><br><span class="line">    @Override</span><br><span class="line">    void initialize() &#123;</span><br><span class="line">        System.out.println(&quot;买一个篮球&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    void startPlay() &#123;</span><br><span class="line">        System.out.println(&quot;开始打篮球&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    void endPlay() &#123;</span><br><span class="line">        System.out.println(&quot;结束打篮球&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Main</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Game a&#x3D;new Football();</span><br><span class="line">        a.play();</span><br><span class="line">        Game b&#x3D;new Basketball();</span><br><span class="line">        b.play();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p><strong>优点：</strong></p>
-<p>1.封装流程，能扩展可变的部分<br>2.提取了公共代码，便于维护<br>3.行为由父类控制，子类实现 </p>
-<p><strong>缺点：</strong><br>每个不同的实现都需要一个子类来实现，类的数量增多，系统更加庞大  </p>
-<p><strong>适用场景</strong><br>多个类共有很多方法且逻辑相同。比较重要的，复杂的方法，可以考虑作为模板方法  </p>
-
-  </article>
-</div>
-
-
-    
-
-
-
-
-</div>
-
-<div class="footer-wrapper container">
-  <footer class="footer clearfix">
-    <div class="clearfix">
-    <a href="http://guoer03.xyz" class="footer-logo">
-      <i class="fa fa-github"></i>
-    </a>
-    <ul class="footer-social-link">
-      <li>© 2019 Arthur Ming</li>
-      <li><a href="http://guoer03.xyz">Home</a></li>
-      
-    </ul>
-    <div class="footer-theme-info">
-      Theme <a href="//github.com/sabrinaluo/hexo-theme-replica" target="_blank" rel="noopener">Replica</a>
-      by <a href="//github.com/sabrinaluo" target="_blank" rel="noopener">Hiitea</a> ❤ Powered by Hexo
-    </div>
-    </div>
-    
-  </footer>
-</div>
-
-
-
-
-<script src="/js/main.js"></script>
-
-</body>
-</html>
+block content
+  article#post(class="")
+    if (!top_img)
+      #post-title.plain= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          - var date_type = theme.post_meta.date_type === 'updated' ? '' : 'date'
+          time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator |
+          each item, index in page.categories.data
+            i.fa.fa-inbox(aria-hidden="true")
+            a(href=url_for(item.path)).post-meta__categories  #[=item.name]
+            if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right.post-meta__separator(aria-hidden="true")
+        if (theme.disqus.enable && theme.disqus.count)
+          if (theme.post_meta.date_type || theme.post_meta.categories && page.categories.data.length > 0)
+            span.post-meta__separator |
+          i.fa.fa-comment-o(aria-hidden="true")
+          a(href=url_for(page.path) + '#disqus_thread')
+            span.disqus-comment-count(data-disqus-identifier=page.path)
+        if (theme.wordcount && theme.wordcount.enable)
+          span.post-meta__separator |
+          span.post-meta-wordcount
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
+  if (theme.post_meta.tags)
+    .post-meta__tag-list
+      each item, index in page.tags.data
+        a(href=url_for(item.path)).post-meta__tags #[=item.name]
+  if (theme.QR_code)
+    if (theme.QR_code.length > 0)
+      .post-qr-code
+        each item in theme.QR_code
+          .post-qr-code-item
+            img.post-qr-code__img(src=(item.itemlist||item).img)
+            .post-qr-code__desc=(item.itemlist||item).text
+  include includes/share/index.pug
+  include includes/pagination.pug
+  if (theme.adv && theme.adv.enable)
+    .post-adv!= theme.adv.info
+  if page.comments !== false
+    include includes/comments/index.pug
