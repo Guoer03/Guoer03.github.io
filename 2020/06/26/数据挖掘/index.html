@@ -96,7 +96,7 @@
         <a href="/tags" class="header-toolbar-left"><i
                   class="fa fa-tags"></i> Tags </a>
         <a href="/tags"
-           class="header-toolbar-right"> 4 </a>
+           class="header-toolbar-right"> 6 </a>
       </li>
       <li>
         <a href="/categories" class="header-toolbar-left"><i
@@ -145,14 +145,15 @@
 <hr>
 <hr>
 <br>
-##认识数据
-**数据对象：** 
->一个数据对象代表一个实体和联系。又被称为样本，实例，数据点，对象，元组等，数据集由具有相同属性的数据对象构成。   
+## 认识数据  
 
+<p><strong>数据对象：</strong>   </p>
+<blockquote>
+<p>一个数据对象代表一个实体和联系。又被称为样本，实例，数据点，对象，元组等，数据集由具有相同属性的数据对象构成。   </p>
+</blockquote>
 <p><strong>属性</strong>：表示一个数据对象的某个特征。  </p>
 <hr>
-<p>###属性类型： </p>
-<p>1.<strong>标称属性</strong>:类别，状态，编码  </p>
+<h3 id="属性类型："><a href="#属性类型：" class="headerlink" title="属性类型："></a>属性类型：</h3><p>1.<strong>标称属性</strong>:类别，状态，编码  </p>
 <blockquote>
 <p>Hair_color={auburn,black,brown,grey,red,white}    </p>
 </blockquote>
@@ -176,15 +177,13 @@
 </blockquote>
 <p>6.<strong>连续属性</strong>：可以取实数。比如身高。<br><img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/5F55BE788A3349038C02C650FF15432A/15915" alt></p>
 <hr>
-<p>###度量数据的中心趋势： </p>
-<ul>
+<h3 id="度量数据的中心趋势："><a href="#度量数据的中心趋势：" class="headerlink" title="度量数据的中心趋势："></a>度量数据的中心趋势：</h3><ul>
 <li>均值(截尾均值-去掉最高和最低值)</li>
 <li>中位数（有噪声时，是对中心趋势的更好近似）</li>
 <li>众数</li>
 <li>中列数=(max-min)/2。  </li>
 </ul>
-<p>###度量数据的离散度：</p>
-<p><strong>四分位数：</strong></p>
+<h3 id="度量数据的离散度："><a href="#度量数据的离散度：" class="headerlink" title="度量数据的离散度："></a>度量数据的离散度：</h3><p><strong>四分位数：</strong></p>
 <ol>
 <li><strong>Q1</strong> (25th 百分位数percentile), <strong>Q3</strong> (75th百分位数percentile)</li>
 <li><strong>IQR = Q3 – Q1</strong></li>
@@ -198,8 +197,7 @@
 <li>胡须: 不超过四分位数1.5 x IQR 的最大/小数据点  </li>
 <li>离群点Outliers: 单独绘出满足某个离群点阈条件的离群点<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/FBFF600BD63A44FA9A456E9E3CB5BFFB/15933" alt> </li>
 </ol>
-<p>###数据统计的图形显示:</p>
-<p><strong>正态分布曲线：</strong>  </p>
+<h3 id="数据统计的图形显示"><a href="#数据统计的图形显示" class="headerlink" title="数据统计的图形显示:"></a>数据统计的图形显示:</h3><p><strong>正态分布曲线：</strong>  </p>
 <ol>
 <li>[μ–σ, μ+σ]:含有约<strong>68％</strong>的测量(μ: 均值, σ: 标准差)  </li>
 <li>[μ–2σ, μ+2σ]: contains about <strong>95%</strong> of it  </li>
@@ -214,7 +212,7 @@
 <br>
 <br>
 <br>
-###相似性度量  
+### 相似性度量  
 
 <hr>
 <p><strong>相似性</strong>：越相似，值越大，介于[0,1]<br><strong>相异性</strong>：越相似，值越小。最小为0，最大值是变化的    </p>
@@ -328,22 +326,21 @@ r:对象i中取1，对象j中取0的属性数 s：对象i中取0，在对象j中
 <p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/DC684D54DA994314B8D34369878C3A60/15920" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/9D6A1CFA4A9245C78FC16EA0A71DDE45/15893" alt><br><img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/B0D391663AA24BFBA88FEE2F8E51141E/16607" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/3E80469F1B6B4FAFAF8DA4842FF65B1A/16609" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/FFAB5D29E9744BDDAC39EBB8FEC68A7E/16611" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/371759E6297449259518ED73CB1955B7/16613" alt>  </p>
 <hr>
 <hr>
-<p>##分类##</p>
-<blockquote>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><blockquote>
 <p>分类：根据训练数据集和类标号属性，构建模型来分类现有数据，目标是分类新数据。 </p>
 </blockquote>
 <pre><code>鲁棒性：对噪声数据或者有空缺的数据，正确预测的能力
 可伸缩性：对大量数据，有效的构建模型的能力
 可解释性：学习模型提供的理解和洞察的层次  </code></pre><br>
-###决策树：由对象的若干属性，属性值和有关决策组成的一棵树。 
+### 决策树：由对象的若干属性，属性值和有关决策组成的一棵树。 
 
 
-<p>###ID3算法:<br>&emsp;&emsp;分之前的信息量：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/DAED1BB459864AB588B021487C130546/15942" alt>  </p>
+<h3 id="ID3算法"><a href="#ID3算法" class="headerlink" title="ID3算法:"></a>ID3算法:</h3><p>&emsp;&emsp;分之前的信息量：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/DAED1BB459864AB588B021487C130546/15942" alt>  </p>
 <p>&emsp;&emsp;分完以后的信息量：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/02DA6D8A9B6F4C5DB831AA74E6794F60/15935" alt>  </p>
 <p>&emsp;&emsp;信息增益：  </p>
-<p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/7896DCE27568409E96E4893E05B2779C/15950" alt><br>###C4.5算法:  </p>
-<p>&emsp;&emsp;增益率：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/CF5AB43A97D54F2E8506F4A091DB792D/15934" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/41CF519812444144854C3FA630733575/16036" alt><br><br><br><br><br><br><br>###CART算法：  </p>
-<blockquote>
+<p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/7896DCE27568409E96E4893E05B2779C/15950" alt>  </p>
+<h3 id="C4-5算法"><a href="#C4-5算法" class="headerlink" title="C4.5算法:"></a>C4.5算法:</h3><p>&emsp;&emsp;增益率：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/CF5AB43A97D54F2E8506F4A091DB792D/15934" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/41CF519812444144854C3FA630733575/16036" alt><br><br><br><br><br><br></p>
+<h3 id="CART算法："><a href="#CART算法：" class="headerlink" title="CART算法："></a>CART算法：</h3><blockquote>
 <p>基尼指数：对每一个属性，进行一个二元划分。  </p>
 </blockquote>
 <p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/CEB629A3C5D94897B2182FBFAA4A674D/15957" alt><br>&emsp;&emsp;基尼指数考虑每个属性的二元划分：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/7DEFB187325B4740AF5BB91149A745DD/15932" alt><br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/BEE27E46DBE64589861D3681568B4312/16039" alt><br><br><br><br><br><br><br>用IF-THEN从树中生成分类规则：<br><img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/2C62BBC2630849B494FE3A5239C53CC0/15951" alt>  </p>
@@ -422,11 +419,10 @@ Boosting：各轮选择集并不独立，它的选择与前轮的学习结果有
 <li>随机地从整个数据库中抽取一个 N (例如：(40 + 2 k))个对象的样本，调用PAM 方法从样本中找出样本的k 个最优的中心点。</li>
 <li>将这 k个中心点应用到整个数据库上，对于每一个非代表对象Oj，判断它与从样本中选出的哪个代表对象距离最近。</li>
 <li>计算（3）中得到的聚类的总代价。若该值小于当前的最小值,用该值替换当前的最小值,保留在这次选样中得到的k 个代表对     象作为到目前为止得到的最好的代表对象的集合。</li>
-<li>返回到步骤（1） ，开始下一个循环。<br>###对比<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/C6E6429852D846899D9287C17CB6C28B/15899" alt>  </li>
+<li>返回到步骤（1） ，开始下一个循环。  <h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/C6E6429852D846899D9287C17CB6C28B/15899" alt>  </li>
 </ul>
 <hr>
-<p>###层次聚类算法</p>
-<blockquote>
+<h3 id="层次聚类算法"><a href="#层次聚类算法" class="headerlink" title="层次聚类算法"></a>层次聚类算法</h3><blockquote>
 <p>将数据对象组成一颗聚类的树不需要类别数k，一旦开始合并与分裂，就不能修正，可伸缩性不好，时间复杂度至少是O（n2）  </p>
 </blockquote>
 <p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/303D83FA6E0641D79B72FEFDCB2E0D3D/15906" alt><br><strong>类间距离计算方法：</strong><br>&emsp;&emsp;1.最小距离法：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/7A4553EC51B149259C2BDCE7CB244580/15946" alt><br>&emsp;&emsp;2.最大距离法:<br>&emsp;&emsp;3.重心法：<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/C502EC699474400FBD1DF0C188E93FB0/15937" alt><br>&emsp;&emsp;4.类间平均距离法：类间所有样本点的平均距离<br><br><br><strong>BIRCH算法：</strong></p>
@@ -442,7 +438,7 @@ Boosting：各轮选择集并不独立，它的选择与前轮的学习结果有
 <li>较好的聚类质量<br>&emsp;&emsp;缺点：<br>&emsp;&emsp;&emsp;1.只能处理数值数据<br>&emsp;&emsp;&emsp;2.对数据输入次序敏感<br>&emsp;&emsp;&emsp;3.CF树结点不总是对应于用户考虑的自然簇<br>&emsp;&emsp;&emsp;4.簇非球形时效果不好<br><img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/D3C580B50B0F40719C495EFFAE7DC478/16085" alt><br>改进的层次聚类方法：集中于<strong>层次聚类和迭代重定位方法的集成</strong>。</li>
 </ul>
 <hr>
-<p>###基于密度的方法：<br><strong>DBSCAN:</strong></p>
+<h3 id="基于密度的方法："><a href="#基于密度的方法：" class="headerlink" title="基于密度的方法："></a>基于密度的方法：</h3><p><strong>DBSCAN:</strong></p>
 <pre><code>直接密度可达：点p在点q的最小半径内
 密度可达：点q有一个直接密度可达的点t，然后点p在点t的最小半径内。
 密度相连：对于点q和点p都是点o密度可达的点，那么点q和点p是密度相连的。  </code></pre><p>&emsp;&emsp;<img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/59EE3B9EC3D244BAA93BC432131CCD85/16094" alt></p>
@@ -453,7 +449,7 @@ Boosting：各轮选择集并不独立，它的选择与前轮的学习结果有
 <p>每个对象存储两个值：<br>&emsp;&emsp;1.对象p核心距离是使得p成为核心对象的最小的半径，如果p不是核心对象，p的核心距离没有定义<br>&emsp;&emsp;2.对象q关于另一个对象p的可达距离。对象q到对象p的可达距离是指p的核心距离和p与q之间欧几里得距离之间的较大值。如果p不是核心对象，p和q之间的可达距离没有意义。  </p>
 <p>  一个点有多个可达距离，选取最小的距离，因为最小的距离就是与该点距离最近的一个簇的距离。  </p>
 <hr>
-<p>###确定数据集中的簇数：<br><img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/CDD728192F664A82BBE5DEDFA135F118/15929" alt><br> <strong>测定聚类质量的外在方法：</strong><br>&emsp;&emsp;簇的<strong>同质性</strong>：越纯越好  </p>
+<h3 id="确定数据集中的簇数："><a href="#确定数据集中的簇数：" class="headerlink" title="确定数据集中的簇数："></a>确定数据集中的簇数：</h3><p><img src="https://note.youdao.com/yws/public/resource/5293e59d1c0da67574e2ddc6d90dbab7/xmlnote/CDD728192F664A82BBE5DEDFA135F118/15929" alt><br> <strong>测定聚类质量的外在方法：</strong><br>&emsp;&emsp;簇的<strong>同质性</strong>：越纯越好  </p>
 <p>&emsp;&emsp;簇的<strong>完全性</strong>：两个对象属于相同的类别，要被分配到相同的簇  </p>
 <p>&emsp;&emsp;碎布袋：把一个异种对象放入一个纯的簇中比放入碎步袋中受更大处罚  </p>
 <p>&emsp;&emsp;小簇保持性：小类分裂比大类分裂更有害  </p>
@@ -463,8 +459,7 @@ Boosting：各轮选择集并不独立，它的选择与前轮的学习结果有
 ----------
 
 <hr>
-<p>##离群点监测</p>
-<blockquote>
+<h2 id="离群点监测"><a href="#离群点监测" class="headerlink" title="离群点监测"></a>离群点监测</h2><blockquote>
 <p>离群点是在数据集中偏离大部分数据的数据。  </p>
 </blockquote>
 <p><strong>全局离群点</strong>：在给定的数据集中，显著偏离的对象<br><strong>情境离群点</strong><br><strong>集体离群点</strong>：一个对象可能相对于所有对象看上去离群，但它相对于它的局部近邻不是离群的。  </p>
