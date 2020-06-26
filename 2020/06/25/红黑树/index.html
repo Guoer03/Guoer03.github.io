@@ -90,13 +90,13 @@
         <a href="/archives" class="header-toolbar-left"><i
                   class="fa fa-file-text"></i> Posts </a>
         <a href="/archives"
-           class="header-toolbar-right"> 2 </a>
+           class="header-toolbar-right"> 3 </a>
       </li>
       <li>
         <a href="/tags" class="header-toolbar-left"><i
                   class="fa fa-tags"></i> Tags </a>
         <a href="/tags"
-           class="header-toolbar-right"> 2 </a>
+           class="header-toolbar-right"> 4 </a>
       </li>
       <li>
         <a href="/categories" class="header-toolbar-left"><i
@@ -146,20 +146,50 @@
 <li>根节点是黑色</li>
 <li>每个叶子节点是黑色</li>
 <li>每个红色节点的两个子节点一定都是黑色</li>
-<li>从任意节点出发到叶子节点，都有相同数目的黑色节点<br><img src="https://upload-images.jianshu.io/upload_images/2392382-4996bbfb4017a3b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/526/format/webp" alt="image"><h2 id="红黑树的三种操作："><a href="#红黑树的三种操作：" class="headerlink" title="红黑树的三种操作："></a>红黑树的三种操作：</h2>所有插入的节点==默认为<strong>红色</strong>==  </li>
+<li>从任意节点出发到叶子节点，都有相同数目的黑色节点<br><img src="https://upload-images.jianshu.io/upload_images/2392382-4996bbfb4017a3b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/526/format/webp" alt="image"><h2 id="红黑树的三种操作："><a href="#红黑树的三种操作：" class="headerlink" title="红黑树的三种操作："></a>红黑树的三种操作：</h2>所有插入的节点默认为<strong>红色</strong></li>
 </ol>
 <p><strong>变色：</strong>  当前节点的父亲是红色，且它的祖父节点的另一个子节点也是红色(叔叔节点)：  </p>
 <ol>
 <li>把父亲，叔叔节点设为黑色</li>
 <li>把++祖父节点也设为红色++</li>
-<li>把指针定义到祖父节点设为当前要操作的节点<br><img src="https://img-blog.csdnimg.cn/20190127224743893.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image"><br><img src="https://img-blog.csdnimg.cn/2019012722490152.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image"></li>
+<li>把指针定义到祖父节点设为当前要操作的节点<br><img src="https://img-blog.csdnimg.cn/20190127224743893.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image"><br><img src="https://img-blog.csdnimg.cn/2019012722490152.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image">  </li>
 </ol>
-<p><strong>左旋：</strong>  当前父节点是红色，叔叔是黑色的时候，且当前节点是右子树。以父节点做左旋<br><img src="https://img-blog.csdnimg.cn/2019012722492131.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image"><br><strong>右旋：</strong>  当前父节点是红色，叔叔是黑色时，且当前节点是左子树。<br><img src="https://img-blog.csdnimg.cn/20190127224929533.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image"></p>
+<p><strong>左旋：</strong>  当前父节点是红色，叔叔是黑色的时候，且当前节点是右子树。以父节点做左旋<br><img src="https://img-blog.csdnimg.cn/2019012722492131.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image">  </p>
+<p><strong>右旋：</strong>  当前父节点是红色，叔叔是黑色时，且当前节点是左子树。<br><img src="https://img-blog.csdnimg.cn/20190127224929533.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxMzI5MzM0MzI=,size_16,color_FFFFFF,t_70" alt="image">  </p>
 <ol>
-<li>把父节点变成黑色</li>
-<li>把祖父节点变为红色</li>
-<li>以祖父节点旋转</li>
+<li>把父节点变成黑色  </li>
+<li>把祖父节点变为红色  </li>
+<li>以祖父节点旋转  </li>
 </ol>
+<h2 id="一堆规则很懵逼？没事，让我们先来看看2-3树"><a href="#一堆规则很懵逼？没事，让我们先来看看2-3树" class="headerlink" title="一堆规则很懵逼？没事，让我们先来看看2-3树  "></a><strong>一堆规则很懵逼？没事，让我们先来看看2-3树</strong>  </h2><h1 id="2-3树"><a href="#2-3树" class="headerlink" title="2-3树"></a>2-3树</h1><blockquote>
+<p>2-3树是所有讲究平衡的树的最初构想  </p>
+</blockquote>
+<p><strong>2-节点</strong>  ：<br><img src="https://img-blog.csdn.net/20160902172253515?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt><br><strong>3-节点</strong>  ：<br><img src="https://img-blog.csdn.net/20160902172607298?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt></p>
+<h2 id="2-3树的插入"><a href="#2-3树的插入" class="headerlink" title="2-3树的插入"></a>2-3树的插入</h2><ul>
+<li><p><strong>2-节点的插入</strong></p>
+<blockquote>
+<p>如果将值插入一个2-节点，则将2-节点扩充为一个3-节点  </p>
+</blockquote>
+</li>
+<li><p><strong>3-节点的插入</strong></p>
+<blockquote>
+<p>3-节点的插入分为以下3种情况</p>
+</blockquote>
+<ol>
+<li>3-节点无父节点，也就是只有这一个3-节点，则会扩充为一个4-节点，然后4-节点会分裂，因为这是2-3树不是2-3-4树。<br><img src="https://img-blog.csdn.net/20160902173818990?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt>  </li>
+</ol>
+</li>
+</ul>
+<pre><code>2.  3-节点有一个2-节点的父节点，此时的操作是3-节点扩充为4-节点，然后分解4-节点，将分解后的新树的父节点融入进2-节点中</code></pre><p><img src="https://img-blog.csdn.net/20160902175211038?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt></p>
+<pre><code>3. 3-节点有一个3-节点的父节点，此时的操作是3-节点扩充为4-节点，分解4-节点，新树父节点向上融合，
+上面的3-节点继续扩充，融和，分解，新树继续向上融合，直到父节点为2-节点为止</code></pre><p><img src="https://img-blog.csdn.net/20160913140427290?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt><br>    2-3树的设计完全可以保证二叉树保持矮矮胖胖的状态，保持性能良好，但是代码中要处理的情况很多，所以出现了 <strong>红黑树</strong>  </p>
+<blockquote>
+<p>红黑树背后逻辑就是2-3树  </p>
+</blockquote>
+<p>红色节点标记就代表指向其的一个红链接，是将3-节点的左边元素作为红节点：<br><img src="https://img-blog.csdn.net/20160905092521430?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt>  </p>
+<p><strong>把红色的链接放平，被红链接连起来的两个点就是一个3-节点</strong>- - - -<br><img src="https://img-blog.csdn.net/20160905092651228?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt></p>
+<hr>
+<h1 id="★一颗红黑树的构造全过程"><a href="#★一颗红黑树的构造全过程" class="headerlink" title="★一颗红黑树的构造全过程"></a>★一颗红黑树的构造全过程</h1><p><img src="https://img-blog.csdn.net/20180212215646595?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd3kwMTIz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt></p>
 
   </article>
 </div>
