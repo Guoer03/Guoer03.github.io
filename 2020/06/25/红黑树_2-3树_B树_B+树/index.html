@@ -305,6 +305,36 @@
 <p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/ACA0F8528C434F20B8DC9116F324ADC0/17328" alt>    </p>
 <p>此时当前结点的关键字个数小于2，兄弟结点的关键字也没有富余，所以父结点中的关键字下移，和两个孩子结点合并，结果如下图所示。</p>
 <p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/1C8D464837074379BD3F8C55407647AA/17330" alt></p>
+<hr>
+<br>
+<br>
+
+<h1 id="并查集"><a href="#并查集" class="headerlink" title="并查集"></a>并查集</h1><hr>
+<p>比如，以计算机学院和软件学院。  </p>
+<p>其中pre[]数组的意思是 例如<strong>pre[3]=15,就意味着3这个人的领导是15</strong>，院长在这个院里的领导只能是自己，比如<strong>pre[4]=4,就为大院长，同时也就是一棵树的根节点</strong>  </p>
+<p>Union算法：</p>
+<pre><code>int unionsearch(int root) //查找根结点
+{
+    int son, tmp;
+    son = root;
+    while(root != pre[root]) //我的上级不是我们的院长，不停的往上走，知道找到院长未知
+        root = pre[root];
+    while(son != root) //路径压缩算法
+    {
+        tmp = pre[son];
+        pre[son] = root;
+        son = tmp;
+    }
+    return root; //大领导
+}    </code></pre><p><strong>join算法</strong>：其实就是从两个院随机选两个人，根据他们找到两个院的最大领导，两个大领导中再随机选一个当另一个部门的副院长      </p>
+<pre><code>void join(int root1, int root2) //虚竹和周芷若做朋友
+{
+    int x, y;
+    x = unionsearch(root1);//我老大是玄慈
+    y = unionsearch(root2);//我老大是灭绝
+    if(x != y) 
+        pre[x] = y; //打一仗，谁赢就当对方老大
+}</code></pre><p><strong>路径压缩算法：</strong>  对于随机的两个人来说，如果老要这样一直往上找自己的领导太过麻烦，所以路径压缩算法就是直接让院长统领所有人，这样的话，每个人就能很快的跟着院长走。<br><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/FB9C816FAB544A77A30A4242339DDF83/17332" alt></p>
 
   </article>
 </div>
