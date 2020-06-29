@@ -251,14 +251,14 @@
 <p>2.删除后发现，当前叶子结点的记录的个数小于2，而它的兄弟结点中有3个记录，从兄弟结点中借取一个key。所以父结点中的28下移，兄弟结点中的26上移,删除结束。  </p>
 <p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/143E9B9ABE6B4E48BDC957A0013CE310/17287" alt>  </p>
 <p>3.删除32  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/0D8B84C8CEC845B494A4D140383C1B44/17299" alt>  </p>
+<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/18BC0D9DBF244AE1B6DE1B966884B929/17289" alt>  </p>
 <p>发现兄弟节点的节点个数不能借—两个节点和父节点融合，变成一个节点  </p>
 <p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/65FF70BC662F4CF6A5FC19678D06C032/17297" alt></p>
 <h1 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h1><hr>
 <blockquote>
 <p>非叶子节点只存储索引</p>
 </blockquote>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/A5C453511C764C84B3B4B5DB18DABAE2/17302" alt></p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/320BAD1F9E8743B9800F65339E48AC7D/17345" alt></p>
 <p><strong>m叉B+树的定义：</strong>  </p>
 <ol>
 <li>内部结点不保存数据，只用于索引，所有数据（或者说记录）都保存在叶子结点中。  </li>
@@ -273,13 +273,13 @@
 <li>针对索引类型结点：若当前结点key的个数小于等于m-1，则插入结束。否则，将这个索引类型结点分裂成两个索引结点，左索引结点包含前(m-1)/2个key，右结点包含m-(m-1)/2个key，将第m/2个key进位到父结点中，进位到父结点的key左孩子指向左结点, 进位到父结点的key右孩子指向右结点。将当前结点的指针指向父结点，然后重复第3步。  <br></li>
 </ol>
 <p><strong>B+树插入过程演示：</strong><br>1.插入5  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/89CC9C024B134B9F8353524BD8B78C0B/17304" alt>  </p>
-<p>2.依次插入8，10，15，16—超过了m-1，要进行分裂。<br>  <img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/042E2F102C954865A5CB2CB0B9580A4A/17306" alt><br><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/D614B09C8C314774B2513607442BF964/17308" alt><br>3.插入17，18<br><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/DB8774F83BFD483F8E5FF681FB36A892/17310" alt><br>依旧需要分裂：  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/1EF7A27D310F4466A2C5314116224A65/17312" alt>  </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/AF681A530E5E4068AFF63C9E7DE4DE35/17349" alt>  </p>
+<p>2.依次插入8，10，15，16—超过了m-1，要进行分裂。<br>  <img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/E04470CAD44548FFB58FD190D3D61FC3/17350" alt><br><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/A1BBDD67B5C9479796D66C457B09422D/17351" alt><br>3.插入17，18<br><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/BC61153AF08F4A25A5EFE9DA7BDE163A/17352" alt><br>依旧需要分裂：  </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/CB614BBD5743430C98357AFE2B1E8C87/17347" alt>  </p>
 <p>4.插入若干数据之后  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/D623F389BAAC42B8AC350D4378C1FE58/17314" alt></p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/5A7E233F7ABF40AD82C3A43DB46609DA/17346" alt></p>
 <p>此时内部节点已满也需要进行分裂：  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/876A13C004E7458C8B9D4C36B4C2491B/17316" alt>  </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/FEC64AE951CB433E946008FA3368E8F9/17341" alt>  </p>
 <p><strong>B+树的删除：</strong>  </p>
 <p>如果叶子结点中没有相应的key，则删除失败。否则执行下面的步骤  </p>
 <p>1.删除叶子结点中对应的key。删除后若结点的key的个数大于等于Math.ceil(m-1)/2 – 1，删除操作结束,否则执行第2步。  </p>
@@ -292,19 +292,19 @@
 <p>注意：通过B+树的删除操作后，索引节点中存在的key，不一定在叶子节点中  </p>
 </blockquote>
 <p><strong>B+树删除过程演示：</strong>    </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/EB652FDDEB2948D4BEB45F3C96466880/17318" alt>  </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/AA00ABD7B2E64D98A806FCFA54C40D6F/17338" alt>  </p>
 <p>1.删除22  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/9BAF1A89B08A419399D7FF279B46D454/17320" alt>  </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/446F7DD53D4C4C0390B10DED1AC3C1C9/17344" alt>  </p>
 <p>2.删除15  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/42C8D23F65AA4F31B578C716D22920B3/17322" alt>    </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/022B237D57BF41C6B0AAC606C76793DB/17339" alt>    </p>
 <p>删除后当前结点只有一个key,不满足条件，而兄弟结点有三个key，可以从兄弟结点借一个关键字为9的记录,同时更新将父结点中的关键字由10也变为9，删除结束。  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/633B109167514D15BED8F4E082BB7EB1/17324" alt>    </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/BD7F43F643C14BD59002D0F5BEB86C15/17342" alt>    </p>
 <p>3.删除7  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/B5FB6D071E0D4075BA7F7A1D48F272FB/17326" alt>    </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/DAADA71A51E94D938B712D46476F5C98/17340" alt>    </p>
 <p>当前结点关键字个数小于2，（左）兄弟结点中的也没有富余的关键字，所以当前结点和兄弟结点合并，并删除父结点中的key，当前结点指向父结点。</p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/ACA0F8528C434F20B8DC9116F324ADC0/17328" alt>    </p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/584D7431AA924A258D7B89C297779E66/17343" alt>    </p>
 <p>此时当前结点的关键字个数小于2，兄弟结点的关键字也没有富余，所以父结点中的关键字下移，和两个孩子结点合并，结果如下图所示。</p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/1C8D464837074379BD3F8C55407647AA/17330" alt></p>
+<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/445A7D865ABF4DAA9958640F1BC01508/17348" alt></p>
 <hr>
 <br>
 <br>
