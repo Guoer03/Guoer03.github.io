@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="java">
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>
+    Redis底层原理剖析 | Guoer03的学习笔记
+  </title>
+  <meta name="description" content="java后端，人工智能">
+  
+  <meta name="keywords" content="
+  缓存,java相关
+  ">
+  
+  <meta name="author" content="Arthur Ming">
+
+  <meta http-equiv="Cache-Control" content="no-transform"/>
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="theme-color" content="#1e2327">
+  <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+  <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+
+  
+<script>
+  var _hmt = _hmt || [];
+  (function(){var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?619384c7a8842a5937347674d96c7276";
+    var s = document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm, s);})();
+</script>
+
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa fa-github"></i></a>
+
+      <div class="navbar-search float-left desktop-only">
+        <div class="navbar-search-form">
+          <label for="gsc-i-id1">This website</label>
+          <div id="google-search">
+            <gcse:search></gcse:search>
+          </div>
+        </div>
+      </div>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">Archives</a></li>
+        
+        
+        <li><a href="/categories">Categories</a></li>
+        
+        
+        <li><a href="/tags">Tags</a></li>
+        
+        
+        <li class="desktop-only"><a href="/atom.xml" target="_blank">RSS</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="/images/header.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> Posts </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 4 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> Tags </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 7 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> Categories </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 0 </a>
+      </li>
+    </ul>
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">Guoer03的学习笔记</a>
+      
+      
+    </h2>
+  </div>
+
+  <div class="container">
+    <div class="header-tab-wrapper clearfix">
+      <span class="header-tab header-tab-selected"><i class="fa fa-thumbs-o-up"></i> Like</span>
+      <span class="header-tab"><i class="fa fa-share-alt"></i> Share</span>
+      <span class="header-tab"><i class="fa fa-comments-o"></i> Discussion</span>
+      <span class="header-tab"><i class="fa fa-bookmark-o"></i> Bookmark </span>
+      <span class="header-tab"><i class="fa fa-smile-o"></i> Smile <i class="fa fa-caret-down"></i></span>
+    </div>
+  </div>
+</header>
+
+
+<div class="post-container container">
+  <h3>
+    <i class="fa fa-user-o"></i>
+    Arthur Ming
+
+    <span class="post-date float-right" title="{{moment(1593525339000).format('MMM DD, YYYY, h:mm:ss A')}}">
+      
+          <i class="fa fa-pencil-square-o"></i>
+      
+      {{moment(1593525339000).fromNow()}}
+    </span>
+  </h3>
+
+  <article class="post-content">
+    <h1>Redis底层原理剖析</h1>
+    <h1 id="Redis基础数据结构"><a href="#Redis基础数据结构" class="headerlink" title="Redis基础数据结构"></a>Redis基础数据结构</h1><blockquote>
+<p>Value的结构不一样  </p>
+</blockquote>
+<p>redis对象头：</p>
+<pre><code>struct RedisObject{
+    int4 type;//4 bits 
+    int4 encoding;//4 bits
+    int24 lru;//24bits
+    int32 refcount;//4bytes
+    void *ptr;//8bytes,64-bit system,指向对象内容的具体存储位置
+}</code></pre><h2 id="string（字符串）"><a href="#string（字符串）" class="headerlink" title="string（字符串）##"></a>string（字符串）##</h2><pre><code>动态字符串，相当于java中的ArrayList,但仅仅是动态上相似。</code></pre><p><strong>扩容规则：</strong><br>当字符串长度小于1M时，扩容是直接加倍现有空间，超过1M时一次只会多扩1M的空间，最大长度为512M  </p>
+<p><strong>键值对 get set</strong> </p>
+<pre><code>&gt; set name codehole
+OK
+&gt; get name
+&quot;codehole&quot;
+&gt; exits name
+(error) ERR unknown command &apos;exits&apos;
+&gt; exists name
+(integer) 1
+&gt; del name
+(integer) 1
+&gt; get name
+(nil)  </code></pre><p><strong>批量键值对 mget  mset</strong>  </p>
+<pre><code>  &gt; mget name1 name2 name3 #返回一个链表
+1) &quot;codehole&quot;
+2) &quot;holycoder&quot;
+3) (nil)
+&gt; mset name1 boy name2 girl name3 unknown
+OK
+&gt; mget name1 name2 name3
+1) &quot;boy&quot;
+2) &quot;girl&quot;
+3) &quot;unknown&quot;  </code></pre><p><strong>过期和set命令扩展</strong>  </p>
+<pre><code>&gt; set name Aurthur
+OK
+&gt; get name
+&quot;Aurthur&quot;
+&gt; expire name 5
+(integer) 1
+&gt; get name
+(nil)
+&gt; setex name 5 Authur  #相当于set+expire
+OK
+&gt; get name
+(nil)
+&gt; setnx name codehole # 相当于set if not exists
+(integer) 1
+&gt; get name
+&quot;codehole&quot;
+&gt; setnx name Aurthur
+(integer) 0</code></pre><p><strong>计数：如果value是个整数，还可以对它进行自增操作。</strong>  </p>
+<blockquote>
+<p>自增范围：signed long的范围：[-2^31, 2^31-1]，超过这个值会报错</p>
+</blockquote>
+<pre><code>&gt; set age 30
+OK
+&gt; incr age
+(integer) 31
+&gt; incrby age 5
+(integer) 36
+&gt; incrby age -7
+(integer) 29</code></pre><h2 id="字符串内部结构："><a href="#字符串内部结构：" class="headerlink" title="字符串内部结构："></a>字符串内部结构：</h2><p>Redis 的字符串叫着<strong>「SDS」</strong>，也就是 <strong>Simple Dynamic String</strong>。它的结构是一个带长度信息的字节数组。    </p>
+<pre><code>struct SDS&lt;T&gt; {
+    T capacity; // 数组容量，用泛型是因为为了节约内存，容量很小的时候用short和byte
+    T len; // 数组长度
+    T free;
+    byte flags; // 特殊标识位，不理睬它
+    byte[] content; // 数组内容
+}  </code></pre><p>其中SDS和C字符串的区别:<br><img src="https://gitee.com/guoer03/picimg/raw/master/16749" alt=""> </p>
+<p><strong>长度很短的时候使用emb形式存储，当长度超过44时是用raw存储。</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16760" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/16762" alt=""><br>有了raw后为什么还会有embstr的编码方式？  </p>
+<p>因为embstr的编码方式有一些优点：  ‘</p>
+<ol>
+<li>embstr将创建字符串对象所需的内存分配次数从raw编码的两次降低为一次 </li>
+<li>释放embstr的字符串只需要调用一次内存释放函数，而释放raw编码的字符串对象需要调用两次内存释放函数</li>
+</ol>
+<hr>
+<h2 id="list（列表）"><a href="#list（列表）" class="headerlink" title="list（列表）"></a>list（列表）</h2><blockquote>
+<p>相当于java里的LinkedList–链表。当最后一个元素被弹出，list自动被删除，内存被回收  </p>
+</blockquote>
+<p>右边进左边出：队列   </p>
+<pre><code>&gt; rpush books python java golang
+(integer) 3
+&gt; llen books
+(integer) 3
+&gt; lpop books
+&quot;python&quot;
+&gt; lpop books
+&quot;java&quot;
+&gt; lpop books
+&quot;golang&quot;
+&gt; exists books
+(integer) 0  </code></pre><p>右边进左边出：栈   </p>
+<pre><code>&gt; rpush books python java golang
+(integer) 3
+&gt; rpop books
+&quot;golang&quot;
+&gt; rpop books
+&quot;java&quot;
+&gt; rpop books
+&quot;python&quot;
+&gt; rpop books
+(nil)
+&gt; exists books
+(integer) 0  </code></pre><p><strong>慢操作</strong>  </p>
+<ul>
+<li><strong>lindex</strong>相当于Java链表中的get(int index)方法,时间复杂度O(n)</li>
+<li><strong>ltrim</strong>两个参数start_index和end_index定义了一个区间，其他的都删掉  </li>
+<li><strong>index</strong>可以为负数，-1位倒数第一个元素  </li>
+</ul>
+<hr>
+<pre><code>&gt; rpush books python java golang  
+(integer) 3  
+&gt; lindex books 1  
+&quot;java&quot;  
+&gt; lrange books 0 -1  
+1) &quot;python&quot;  
+2) &quot;java&quot;  
+3) &quot;golang&quot;  
+&gt; ltrim books 1 0  
+OK  
+&gt; exists books  
+(integer) 0  </code></pre><p><strong>list的具体实现：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16803" alt=""><br>元素较少时：是用ziplist，紧挨在一起。  </p>
+<pre><code>127.0.0.1:6379&gt; rpush books java python cpp golang
+(integer) 4
+127.0.0.1:6379&gt; debug object books
+Value at:00007FF1070027C0 refcount:1 encoding:ziplist serializedlength:39 lru:15949445 lru_seconds_idle:14  </code></pre><p>当数据量很多时—<strong>quicklist</strong>，普通链表需要的指针占用太大空间，会加重内存的碎片化。quicklist里的每个ziplist都有一个prev和next指针。  </p>
+<p><strong>压缩列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16826" alt="">  </p>
+<pre><code>struct ziplist&lt;T&gt;{
+    int32 zlbytes;//整个压缩列表占用字节数
+    int32 zltail_offset;//最后一个元素距离列表起始位置的偏移量，用于快速定位到最后一个节点
+    int16 zllength;//元素个数
+    T[] entries;//元素内容列表，挨个挨个紧凑存储
+    int8 zlend;//标志压缩列表的结束，值恒为0xFF
+}  </code></pre><hr>
+<pre><code>struct entry{
+    int&lt;var&gt; prelen//前一个entry的字节长度
+    int&lt;var&gt; encoding; // 元素类型编码
+    optional byte[] content; // 元素内容
+}  </code></pre><p>它的 <strong>prevlen</strong> 字段表示前一个 entry 的字节长度，当压缩列表倒着遍历时，需要通过这个字段来快速定位到下一个元素的位置。它是一个变长的整数，当字符串长度小于254(0xFE) 时，使用一个字节表示；如果达到或超出 254(0xFE) 那就使用 5 个字节来表<br>示。  </p>
+<p><strong>快速列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17483" alt="">  </p>
+<pre><code>struct quicklistNode {
+    quicklistNode* prev;
+    quicklistNode* next;
+    ziplist* zl; // 指向压缩列表
+    int32 size; // ziplist 的字节总数
+    int16 count; // ziplist 中的元素数量
+    int2 encoding; // 存储形式 2bit，原生字节数组还是 LZF 压缩存储
+    ...
+}
+struct quicklist {
+    quicklistNode* head;
+    quicklistNode* tail;
+    long count; // 元素总数
+    int nodes; // ziplist 节点的个数
+    int compressDepth; // LZF 算法压缩深度
+    ...
+}  </code></pre><p><strong>每个ziplist存多少元素？</strong>   </p>
+<blockquote>
+<p>quicklist 内部默认单个 ziplist 长度为 8k 字节，超出了这个字节数，就会新起一个<br>ziplist。ziplist 的长度由配置参数 list-max-ziplist-size 决定。  </p>
+</blockquote>
+<p><strong>压缩深度:</strong>    </p>
+<blockquote>
+<p>quicklist 默认的压缩深度是 0，也就是不压缩。压缩的实际深度由配置参数 list compress-depth 决定。为了支持快速的 push/pop 操作，quicklist 的首尾两个 ziplist 不压缩，此时深度就是 1。如果深度为 2，就表示 quicklist 的首尾第一个 ziplist 以及首尾第二个 ziplist 都不压缩。  </p>
+</blockquote>
+<hr>
+<h2 id="hash（字典）"><a href="#hash（字典）" class="headerlink" title="hash（字典）"></a>hash（字典）</h2><blockquote>
+<p>相当于HashMap,无序字典。不同于java中hashMap的是，值只能是字符串，都是用拉链法处理冲突。  </p>
+</blockquote>
+<p>rehash操作有所不同：先看hashmap中的rehash：<strong>一次性全部rehash</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17417" alt="">  </p>
+<p>而redis为了性能，不堵塞服务，采用了<strong>渐进式hash策略</strong>：  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/17423" alt=""><br>渐进式 rehash 会在 rehash 的同时，保留新旧两个 hash 结构，查询时会同时查询两个hash 结构，然后后续循序渐进地将旧 hash 的内容一点点迁移到新的 hash 结构中。</p>
+<pre><code>&gt; hset books java &quot;think in java&quot; # 命令行的字符串如果包含空格，要用引号括起来
+(integer) 1
+&gt; hset books golang &quot;concurrency in go&quot;
+(integer) 1
+&gt; hset books python &quot;python cookbook&quot;
+(integer) 1
+&gt; hgetall books # entries()，key 和 value 间隔出现
+1) &quot;java&quot;
+2) &quot;think in java&quot;
+3) &quot;golang&quot;
+4) &quot;concurrency in go&quot;
+5) &quot;python&quot;
+6) &quot;python cookbook&quot;
+&gt; hlen books
+(integer) 3
+&gt; hget books java
+&quot;think in java&quot;
+&gt; hset books golang &quot;learning go programming&quot; # 因为是更新操作，所以返回 0
+(integer) 0
+&gt; hget books golang &quot;learning go programming&quot;
+&gt; hmset books java &quot;effective java&quot; python &quot;learning python&quot; golang &quot;modern golang
+programming&quot; # 批量 set
+OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17436" alt=""><br><strong>hash函数：</strong>siphash：即使在输入key很小的情况下，也可以产生随机性特别好的输出  </p>
+<p><strong>hash攻击：</strong>hash函数如果具有偏向性，黑客就可能利用偏向性对服务器进行攻击，因为这样的hash函数会导致hash第二维链表长度极为不均匀，甚至所有的计算元素集中到个别链表中</p>
+<p>扩容条件：当hash表中元素等于第一维数组的长度时就会开始扩容，新数组是原来的两倍，如果Redis正在bgsave，就尽量不扩容，但是hash表元素个数如果达到了第一维数组的五倍以上，就会强制扩容</p>
+<p><strong>缩容条件：</strong>元素个数低于数组长度的10%，缩容时不会考虑Redis是否在做bgsave。</p>
+<p>set的结构底层也是字典，不过所有的value全部都是null，java 中set底层由hashmap实现，元素全部作为key，value为null，则可达到自动去重。             </p>
+<hr>
+<h2 id="zset-有序列表"><a href="#zset-有序列表" class="headerlink" title="zset(有序列表)"></a>zset(有序列表)</h2><blockquote>
+<p>根据score对value进行排序： zset 可以用来存粉丝列表，value 值是粉丝的用户 ID，score 是关注时间。我们可以对粉丝列表按关注时间进行排序。  </p>
+</blockquote>
+<p>语法：    </p>
+<pre><code>&gt; zadd books 9.0 &quot;think in java&quot;
+(integer) 1
+&gt; zadd books 8.9 &quot;java concurrency&quot;
+(integer) 1
+&gt; zadd books 8.6 &quot;java cookbook&quot;
+(integer) 1
+&gt; zrange books 0 -1 # 按 score 排序列出，参数区间为排名范围
+1) &quot;java cookbook&quot;
+2) &quot;java concurrency&quot;
+3) &quot;think in java&quot;
+&gt; zrevrange books 0 -1 # 按 score 逆序列出，参数区间为排名范围
+1) &quot;think in java&quot;
+2) &quot;java concurrency&quot;
+3) &quot;java cookbook&quot;
+&gt; zcard books # 相当于 count()
+(integer) 3
+&gt; zscore books &quot;java concurrency&quot; # 获取指定 value 的 score
+&quot;8.9000000000000004&quot; # 内部 score 使用 double 类型进行存储，所以存在小数点精度问题
+&gt; zrank books &quot;java concurrency&quot; # 排名
+(integer) 1
+&gt; zrangebyscore books 0 8.91 # 根据分值区间遍历 zset
+1) &quot;java cookbook&quot;
+2) &quot;java concurrency&quot;
+&gt; zrangebyscore books -inf 8.91 withscores # 根据分值区间 (-∞, 8.91] 遍历 zset，同时返
+回分值。inf 代表 infinite，无穷大的意思。
+1) &quot;java cookbook&quot;
+2) &quot;8.5999999999999996&quot;
+3) &quot;java concurrency&quot;
+4) &quot;8.9000000000000004&quot;
+&gt; zrem books &quot;java concurrency&quot; # 删除 value
+(integer) 1
+&gt; zrange books 0 -1
+1) &quot;java cookbook&quot;
+2) &quot;think in java&quot;  </code></pre><p><strong>跳跃列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17510" alt="">  </p>
+<p><strong>查找步骤：</strong><br>    查找的步骤是从头节点的顶层开始，查到第一个大于指定元素的节点时，退回上一节点，在下一层继续查找。<br>例如我们要在上面的列表中查询16。</p>
+<ul>
+<li>从头节点的最顶层开始，先到节点7。</li>
+<li>7的下一个节点是39，大于16，因此我们退回到7</li>
+<li>从7开始，在下一层继续查找，就可以找到16。  </li>
+</ul>
+<p><strong>插入过程：</strong><br>     在搜索合适插入点的过程中将「搜索路径」摸出来了，然后就可以开始创建新节点了，创建的时候需要给这个节点随机分配一个层数，再将搜索路径上的节点和这个新节点通过前向后向指针串起来。如果分配的新节点的高度高于当前跳跃列表的最大高度，就需要更新一下跳跃列表的最大高度。  </p>
+<blockquote>
+<p>定义了两个数组，update数组用来存储搜索路径，rank数组用来存储节点跨度。<br>第一步操作是找出要插入节点的搜索路径，并且记录节点跨度数。<br>接着开始插入，先随机一个层数。如果随机出的层数大于当前的层数，就需要继续填充update和rank数组，并更新skiplist的最大层数。<br>然后调用zslCreateNode函数创建新的节点。<br>创建好节点后，就根据搜索路径数据提供的位置，从第一层开始，逐层插入节点（更新指针），并其他节点的span值。<br>最后还要更新回溯节点，以及将skiplist的长度加一。<br>这就是插入新元素的整个过程。   </p>
+</blockquote>
+<p><strong>随机层数的计算过程如下：</strong>  </p>
+<blockquote>
+<p>相当于做一次丢硬币的实验，如果遇到正面，继续丢，遇到反面，则停止。各个元素的层数，期望值是2层。  </p>
+</blockquote>
+<p><strong>更新过程：</strong><br>当对应的value不存在，就直接插入，如果value存在并且score更新后并没有改变排列顺序，则直接更新score的值，如果排序会发生改变，则直接删除再插入  </p>
+<p><strong>如果 score 值都一样：</strong>  </p>
+<blockquote>
+<p>zset 中所有的 score 值都是一样的，zset 的查找性能会退化为<br>O(n) 么？Redis 作者自然考虑到了这一点，所以 zset 的排序元素不只看 score 值，如果score 值相同还需要再比较 value 值 (字符串比较)。  </p>
+</blockquote>
+<p><strong>元素排名：</strong><br>  给每一个 forward 指针都增加了 span 属性，span 是「跨度」的意思，表示从前一个节点沿着当前层的 forward 指针跳到当前这个节点中间会跳过多少个节点。  </p>
+<pre><code>struct zslforward {
+    zslnode* item;
+    long span; // 跨度
+}  </code></pre><blockquote>
+<p>这样当我们要计算一个元素的排名时，只需要将「搜索路径」上的经过的所有节点的跨度 span 值进行叠加就可以算出元素的最终 rank 值。  </p>
+</blockquote>
+
+  </article>
+</div>
+
+
+    
+
+
+
+
+</div>
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+    <a href="http://guoer03.xyz" class="footer-logo">
+      <i class="fa fa-github"></i>
+    </a>
+    <ul class="footer-social-link">
+      <li>© 2020 Arthur Ming</li>
+      <li><a href="http://guoer03.xyz">Home</a></li>
+      
+    </ul>
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <div class="footer-theme-info">
+      MingHai ❤ Love My girl gl
+    </div>
+    </div>
+    
+  </footer>
+</div>
+
+
+
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>

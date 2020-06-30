@@ -144,18 +144,49 @@
     <li class="">
       <a href="/">Overview</a></li>
     <li class="">
-      <a href="/archives">Posts <span class="counter">3</span></a>
+      <a href="/archives">Posts <span class="counter">4</span></a>
     </li>
     <li class="">
       <a href="/categories">Categories <span
                 class="counter">0</span></a></li>
     <li class="selected">
-      <a href="/tags">Tags <span class="counter">6</span></a></li>
+      <a href="/tags">Tags <span class="counter">7</span></a></li>
   </ul>
 </nav>
 
     <div class="body-secondary">
       <ul class="archive-list">
+        
+        <li class="archive-list-item">
+          <h2><a href="/2020/06/30/Redis%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90/">Redis底层原理剖析</a></h2>
+          <p>
+               Redis基础数据结构  
+ Value的结构不一样   
+ 
+ redis对象头： 
+  struct RedisObject{
+    int4 type;//4 bits 
+    int4 encoding;//4 bits
+    int24 lru;//24bits
+    int...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/%E7%BC%93%E5%AD%98/">缓存</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/java%E7%9B%B8%E5%85%B3/">java相关</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <i class="fa fa-folder-open"></i> Uncategorized
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1593525339000).fromNow()}}</span>
+          </div>
+        </li>
         
         <li class="archive-list-item">
           <h2><a href="/2020/06/25/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a></h2>
@@ -165,9 +196,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a></li>
-            
             <li class="tag-list-item"><a href="/tags/java%E7%9B%B8%E5%85%B3/">java相关</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a></li>
             
           </ul>
           <div class="post-info">
