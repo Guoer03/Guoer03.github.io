@@ -208,33 +208,32 @@
 <li>每个结点中的关键字都按照从小到大的顺序排列，每个关键字的左子树中的所有关键字都小于它，而右子树中的所有关键字都大于它。</li>
 <li>所有叶子结点都位于同一层，或者说根结点到每个叶子结点的长度都相同。</li>
 </ol>
-<p><img src="https://note.youdao.com/yws/public/resource/abbb6ba8b967f0d31d3642658ce9e647/xmlnote/1703D74CB8564CE593499C528C77BD21/17384" alt=""><br><strong>插入规则：</strong>  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1.jpeg" alt=""><br><strong>插入规则：</strong>  </p>
 <ol>
 <li>根据要插入的key的值，找到叶子结点并插入。</li>
 <li>判断当前结点key的个数是否小于等于m-1，若满足则结束，否则进行第3步。</li>
 <li>以结点中间的key为中心分裂成左右两部分，然后将这个中间的key插入到父结点中，这个key的左子树指向分裂后的左半部分，这个key的右子支指向分裂后的右半部分，然后将当前结点指向父结点，继续进行第3步。</li>
 </ol>
 <p><strong>B树插入过程演示</strong><br>1.在空树中插入39  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/52237F046BDE464896E1DDAF07ECB9AE/17376" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/2.jpeg" alt=""></p>
 <p>2.继续插入22，97和41  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/AB175E1117084624998ED96DC51DA710/17374" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/3.jpeg" alt=""></p>
 <p>3.继续插入53  </p>
- <img src="/2020/06/25/%E7%BA%A2%E9%BB%91%E6%A0%91_2-3%E6%A0%91_B%E6%A0%91_B+%E6%A0%91/17373.jpeg" class="">
-
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/17373.jpeg" alt=""></p>
 <p>4.分裂  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/FB548AAAFAC24DE38108CA92ADDE4E85/17377" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/5.jpeg" alt=""></p>
 <p>5.依次插入13，21，40，同样会造成分裂  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/E198C43BCF1B4C59846B1FD5BD6783CB/17375" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/17375.jpeg" alt="">  </p>
 <p>6.依次插入30，27, 33 ；36，35，34 ；24，29  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/8BA024F4EA7C4DC8A2B0458A779C16F3/17369" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/17369.jpeg" alt=""></p>
 <p>7.插入26  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/1DB78449DC2A4BB4A0AABCC6F54EE7B8/17372" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/17372.jpeg" alt=""></p>
 <p>8.分裂</p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/7001A1DEF9A947F7BE25BFAEF8317702/17370" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/17370.jpeg" alt="">  </p>
 <p>9.进位后导致根节点满了–根节点继续分裂  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/F43FB30D30254B9481C9DE91E673F0F1/17368" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232737701-1115673096.png" alt=""></p>
 <p>10.最后再依次插入key为17,28,29,31,32  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/4905B409AE0742B7BDAF858996F6618B/17367" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232748270-1888091858.png" alt="">  </p>
 <br>
 为了满足第七次操作结束时的情况，也就是需要向上融合时，首先让根节点能够容纳新节点，之后再进行分裂操作，故把每个节点的数组长度设为m而不是m-1
 
@@ -245,21 +244,21 @@
 <li>如果兄弟结点key个数大于Math.ceil(m/2)-1，则父结点中的key下移到该结点，兄弟结点中的一个key上移，删除操作结束。</li>
 </ol>
 <p><strong>B树删除过程演示</strong></p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/63B54A2825824BE4BC52C61B4C1ED7A9/17366" alt="">  </p>
-<p>在上面的B树中删除21，删除后结点中的关键字个数仍然大于等2，所以删除结束。  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232754144-973589199.png" alt="">   </p>
+<p>在上面的B树中删除21，删除后结点中的关键字个数仍然大于等2，所以删除结束。<br><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232800149-881832132.png" alt=""></p>
 <p>1.删除27！—-27的后继为28，用28替换27，然后在28（原27）的右孩子结点中删除28。  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/4DBB9615E034474D9C6668EE39CC886E/17360" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232805316-736624542.png" alt="">  </p>
 <p>2.删除后发现，当前叶子结点的记录的个数小于2，而它的兄弟结点中有3个记录，从兄弟结点中借取一个key。所以父结点中的28下移，兄弟结点中的26上移,删除结束。  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/143E9B9ABE6B4E48BDC957A0013CE310/17287" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232813762-797146286.png" alt="">  </p>
 <p>3.删除32  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/B860357571654ECDBE6666505BF84D0C/17359" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232817843-722364883.png" alt="">  </p>
 <p>发现兄弟节点的节点个数不能借—两个节点和父节点融合，变成一个节点  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/f2b356819e4114d5cf763a7342163fb5/xmlnote/A7B92065B07B4B479A1CBA30EB1DE66F/17371" alt=""></p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232829066-149754287.png" alt=""></p>
 <h1 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h1><hr>
 <blockquote>
 <p>非叶子节点只存储索引</p>
 </blockquote>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/320BAD1F9E8743B9800F65339E48AC7D/17345" alt=""></p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232854940-1019144331.png" alt=""></p>
 <p><strong>m叉B+树的定义：</strong>  </p>
 <ol>
 <li>内部结点不保存数据，只用于索引，所有数据（或者说记录）都保存在叶子结点中。  </li>
@@ -274,11 +273,11 @@
 <li>针对索引类型结点：若当前结点key的个数小于等于m-1，则插入结束。否则，将这个索引类型结点分裂成两个索引结点，左索引结点包含前(m-1)/2个key，右结点包含m-(m-1)/2个key，将第m/2个key进位到父结点中，进位到父结点的key左孩子指向左结点, 进位到父结点的key右孩子指向右结点。将当前结点的指针指向父结点，然后重复第3步。  <br></li>
 </ol>
 <p><strong>B+树插入过程演示：</strong><br>1.插入5  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/AF681A530E5E4068AFF63C9E7DE4DE35/17349" alt="">  </p>
-<p>2.依次插入8，10，15，16—超过了m-1，要进行分裂。<br>  <img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/E04470CAD44548FFB58FD190D3D61FC3/17350" alt=""><br><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/A1BBDD67B5C9479796D66C457B09422D/17351" alt=""><br>3.插入17，18<br><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/BC61153AF08F4A25A5EFE9DA7BDE163A/17352" alt=""><br>依旧需要分裂：  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/CB614BBD5743430C98357AFE2B1E8C87/17347" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232858129-694616618.png" alt="">  </p>
+<p>2.依次插入8，10，15，16—超过了m-1，要进行分裂。<br>  <img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232905559-1698012761.png" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232909712-1807724284.png" alt=""><br>3.插入17，18<br><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232917817-1240573630.png" alt=""><br>依旧需要分裂：  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232921679-618565224.png" alt="">  </p>
 <p>4.插入若干数据之后  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/5A7E233F7ABF40AD82C3A43DB46609DA/17346" alt=""></p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232940557-1204742223.png" alt="">  </p>
 <p>此时内部节点已满也需要进行分裂：  </p>
 <p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/FEC64AE951CB433E946008FA3368E8F9/17341" alt="">  </p>
 <p><strong>B+树的删除：</strong>  </p>
@@ -293,19 +292,19 @@
 <p>注意：通过B+树的删除操作后，索引节点中存在的key，不一定在叶子节点中  </p>
 </blockquote>
 <p><strong>B+树删除过程演示：</strong>    </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/AA00ABD7B2E64D98A806FCFA54C40D6F/17338" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232951603-2095664521.png" alt="">  </p>
 <p>1.删除22  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/446F7DD53D4C4C0390B10DED1AC3C1C9/17344" alt="">  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406232956857-909502342.png" alt="">  </p>
 <p>2.删除15  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/022B237D57BF41C6B0AAC606C76793DB/17339" alt="">    </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406233002074-155906598.png" alt="">    </p>
 <p>删除后当前结点只有一个key,不满足条件，而兄弟结点有三个key，可以从兄弟结点借一个关键字为9的记录,同时更新将父结点中的关键字由10也变为9，删除结束。  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/BD7F43F643C14BD59002D0F5BEB86C15/17342" alt="">    </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406233008129-433585803.png" alt="">    </p>
 <p>3.删除7  </p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/DAADA71A51E94D938B712D46476F5C98/17340" alt="">    </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406233017339-92051658.png" alt="">    </p>
 <p>当前结点关键字个数小于2，（左）兄弟结点中的也没有富余的关键字，所以当前结点和兄弟结点合并，并删除父结点中的key，当前结点指向父结点。</p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/584D7431AA924A258D7B89C297779E66/17343" alt="">    </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406233022828-172757536.png" alt="">    </p>
 <p>此时当前结点的关键字个数小于2，兄弟结点的关键字也没有富余，所以父结点中的关键字下移，和两个孩子结点合并，结果如下图所示。</p>
-<p><img src="https://note.youdao.com/yws/public/resource/31c50aa7409fe14ad6c1a51a94fabb30/xmlnote/445A7D865ABF4DAA9958640F1BC01508/17348" alt=""></p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/834468-20180406233027773-1578264573.png" alt=""></p>
 <hr>
 <br>
 <br>
@@ -335,7 +334,7 @@
     y = unionsearch(root2);//我老大是灭绝
     if(x != y) 
         pre[x] = y; //打一仗，谁赢就当对方老大
-}</code></pre><p><strong>路径压缩算法：</strong>  对于随机的两个人来说，如果老要这样一直往上找自己的领导太过麻烦，所以路径压缩算法就是直接让院长统领所有人，这样的话，每个人就能很快的跟着院长走。<br><img src="https://note.youdao.com/yws/public/resource/9f424c10b81b30067b839d402ce94a46/xmlnote/FB9C816FAB544A77A30A4242339DDF83/17332" alt=""></p>
+}</code></pre><p><strong>路径压缩算法：</strong>  对于随机的两个人来说，如果老要这样一直往上找自己的领导太过麻烦，所以路径压缩算法就是直接让院长统领所有人，这样的话，每个人就能很快的跟着院长走。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200630153316.png" alt=""></p>
 
   </article>
 </div>
