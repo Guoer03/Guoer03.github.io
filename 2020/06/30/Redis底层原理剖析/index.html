@@ -216,7 +216,7 @@ OK
     T free;
     byte flags; // 特殊标识位，不理睬它
     byte[] content; // 数组内容
-}  </code></pre><p>其中SDS和C字符串的区别:<br><img src="https://gitee.com/guoer03/picimg/raw/master/16749" alt=""> </p>
+}  </code></pre><p>其中SDS和C字符串的区别:<br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard.png" alt=""> </p>
 <p><strong>长度很短的时候使用emb形式存储，当长度超过44时是用raw存储。</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16760" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/16762" alt=""><br>有了raw后为什么还会有embstr的编码方式？  </p>
 <p>因为embstr的编码方式有一些优点：  ‘</p>
 <ol>
@@ -269,12 +269,12 @@ OK
 &gt; ltrim books 1 0  
 OK  
 &gt; exists books  
-(integer) 0  </code></pre><p><strong>list的具体实现：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16803" alt=""><br>元素较少时：是用ziplist，紧挨在一起。  </p>
+(integer) 0  </code></pre><p><strong>list的具体实现：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(3).png" alt=""><br>元素较少时：是用ziplist，紧挨在一起。  </p>
 <pre><code>127.0.0.1:6379&gt; rpush books java python cpp golang
 (integer) 4
 127.0.0.1:6379&gt; debug object books
 Value at:00007FF1070027C0 refcount:1 encoding:ziplist serializedlength:39 lru:15949445 lru_seconds_idle:14  </code></pre><p>当数据量很多时—<strong>quicklist</strong>，普通链表需要的指针占用太大空间，会加重内存的碎片化。quicklist里的每个ziplist都有一个prev和next指针。  </p>
-<p><strong>压缩列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16826" alt="">  </p>
+<p><strong>压缩列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(4).png" alt="">  </p>
 <pre><code>struct ziplist&lt;T&gt;{
     int32 zlbytes;//整个压缩列表占用字节数
     int32 zltail_offset;//最后一个元素距离列表起始位置的偏移量，用于快速定位到最后一个节点
@@ -287,7 +287,7 @@ Value at:00007FF1070027C0 refcount:1 encoding:ziplist serializedlength:39 lru:15
     int&lt;var&gt; encoding; // 元素类型编码
     optional byte[] content; // 元素内容
 }  </code></pre><p>它的 <strong>prevlen</strong> 字段表示前一个 entry 的字节长度，当压缩列表倒着遍历时，需要通过这个字段来快速定位到下一个元素的位置。它是一个变长的整数，当字符串长度小于254(0xFE) 时，使用一个字节表示；如果达到或超出 254(0xFE) 那就使用 5 个字节来表<br>示。  </p>
-<p><strong>快速列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17483" alt="">  </p>
+<p><strong>快速列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(5).png" alt="">  </p>
 <pre><code>struct quicklistNode {
     quicklistNode* prev;
     quicklistNode* next;
@@ -316,9 +316,9 @@ struct quicklist {
 <h2 id="hash（字典）"><a href="#hash（字典）" class="headerlink" title="hash（字典）"></a>hash（字典）</h2><blockquote>
 <p>相当于HashMap,无序字典。不同于java中hashMap的是，值只能是字符串，都是用拉链法处理冲突。  </p>
 </blockquote>
-<p>rehash操作有所不同：先看hashmap中的rehash：<strong>一次性全部rehash</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17417" alt="">  </p>
+<p>rehash操作有所不同：先看hashmap中的rehash：<strong>一次性全部rehash</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(6).png" alt="">  </p>
 <p>而redis为了性能，不堵塞服务，采用了<strong>渐进式hash策略</strong>：  </p>
-<p><img src="https://gitee.com/guoer03/picimg/raw/master/17423" alt=""><br>渐进式 rehash 会在 rehash 的同时，保留新旧两个 hash 结构，查询时会同时查询两个hash 结构，然后后续循序渐进地将旧 hash 的内容一点点迁移到新的 hash 结构中。</p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(7).png" alt=""><br>渐进式 rehash 会在 rehash 的同时，保留新旧两个 hash 结构，查询时会同时查询两个hash 结构，然后后续循序渐进地将旧 hash 的内容一点点迁移到新的 hash 结构中。</p>
 <pre><code>&gt; hset books java &quot;think in java&quot; # 命令行的字符串如果包含空格，要用引号括起来
 (integer) 1
 &gt; hset books golang &quot;concurrency in go&quot;
@@ -341,7 +341,7 @@ struct quicklist {
 &gt; hget books golang &quot;learning go programming&quot;
 &gt; hmset books java &quot;effective java&quot; python &quot;learning python&quot; golang &quot;modern golang
 programming&quot; # 批量 set
-OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17436" alt=""><br><strong>hash函数：</strong>siphash：即使在输入key很小的情况下，也可以产生随机性特别好的输出  </p>
+OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(8).png" alt=""><br><strong>hash函数：</strong>siphash：即使在输入key很小的情况下，也可以产生随机性特别好的输出  </p>
 <p><strong>hash攻击：</strong>hash函数如果具有偏向性，黑客就可能利用偏向性对服务器进行攻击，因为这样的hash函数会导致hash第二维链表长度极为不均匀，甚至所有的计算元素集中到个别链表中</p>
 <p>扩容条件：当hash表中元素等于第一维数组的长度时就会开始扩容，新数组是原来的两倍，如果Redis正在bgsave，就尽量不扩容，但是hash表元素个数如果达到了第一维数组的五倍以上，就会强制扩容</p>
 <p><strong>缩容条件：</strong>元素个数低于数组长度的10%，缩容时不会考虑Redis是否在做bgsave。</p>
@@ -384,7 +384,7 @@ OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https:
 (integer) 1
 &gt; zrange books 0 -1
 1) &quot;java cookbook&quot;
-2) &quot;think in java&quot;  </code></pre><p><strong>跳跃列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/17510" alt="">  </p>
+2) &quot;think in java&quot;  </code></pre><p><strong>跳跃列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(9).png" alt="">  </p>
 <p><strong>查找步骤：</strong><br>    查找的步骤是从头节点的顶层开始，查到第一个大于指定元素的节点时，退回上一节点，在下一层继续查找。<br>例如我们要在上面的列表中查询16。</p>
 <ul>
 <li>从头节点的最顶层开始，先到节点7。</li>
