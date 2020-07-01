@@ -409,8 +409,195 @@ OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https:
     zslnode* item;
     long span; // 跨度
 }  </code></pre><blockquote>
-<p>这样当我们要计算一个元素的排名时，只需要将「搜索路径」上的经过的所有节点的跨度 span 值进行叠加就可以算出元素的最终 rank 值。  </p>
+<p>这样当我们要计算一个元素的排名时，只需要将「搜索路径」上的经过的所有节点的跨度 span 值进行叠加就可以算出元素的最终 rank 值。   </p>
 </blockquote>
+<hr>
+<h2 id="HyperLogLog"><a href="#HyperLogLog" class="headerlink" title="HyperLogLog:"></a>HyperLogLog:</h2><blockquote>
+<p>提供不精确的去重计数方案</p>
+</blockquote>
+<pre><code>127.0.0.1:6379&gt; pfadd codehole user1
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 1
+127.0.0.1:6379&gt; pfadd codehole user2
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 2
+127.0.0.1:6379&gt; pfadd codehole user3
+(integer) 1 
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 3
+127.0.0.1:6379&gt; pfadd codehole user4
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 4
+127.0.0.1:6379&gt; pfadd codehole user5
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 5
+127.0.0.1:6379&gt; pfadd codehole user6
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 6
+127.0.0.1:6379&gt; pfadd codehole user7 user8 user9 user10
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 10  </code></pre><p><strong>pfmerge:</strong>在网站中我们有两个内容差不多的页面，运营说需要这两个页面的数据进行合并。其中页面的 UV 访问量也需要合并，那这个时候 pfmerge 就可以派上用场了。  </p>
+<p><strong>注意事项：</strong>hyperLogLog在计数很小的时候，采用稀疏矩阵存储，计数慢慢变大使得稀疏矩阵所用空间超过阈值时才会转变成稠密矩阵，才会占用12k空间。  </p>
+<hr>
+<h2 id="HyperLogLog-1"><a href="#HyperLogLog-1" class="headerlink" title="HyperLogLog:"></a>HyperLogLog:</h2><blockquote>
+<p>提供不精确的去重计数方案  </p>
+</blockquote>
+<pre><code>127.0.0.1:6379&gt; pfadd codehole user1
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 1
+127.0.0.1:6379&gt; pfadd codehole user2
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 2
+127.0.0.1:6379&gt; pfadd codehole user3
+(integer) 1 
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 3
+127.0.0.1:6379&gt; pfadd codehole user4
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 4
+127.0.0.1:6379&gt; pfadd codehole user5
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 5
+127.0.0.1:6379&gt; pfadd codehole user6
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 6
+127.0.0.1:6379&gt; pfadd codehole user7 user8 user9 user10
+(integer) 1
+127.0.0.1:6379&gt; pfcount codehole
+(integer) 10</code></pre><p><strong>pfmerge:</strong>在网站中我们有两个内容差不多的页面，运营说需要这两个页面的数据进行合并。其中页面的 UV 访问量也需要合并，那这个时候 pfmerge 就可以派上用场了。  </p>
+<p><strong>注意事项</strong>：hyperLogLog在计数很小的时候，采用稀疏矩阵存储，计数慢慢变大使得稀疏矩阵所用空间超过阈值时才会转变成稠密矩阵，才会占用12k空间。  </p>
+<p><strong>HyperLogLog的概率学证明：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701233939.png" alt=""><br>但是当统计数据量很小的时候误差较大，故采用调和平均数<br>调和平均数可以过滤掉异常离群点。<br>HyperLogLog原理：分了很多个桶，它的实现中，设有 16384 个桶，即：2^14 = 16384，每个桶有 6 位，每个桶可以表达的最大数字是：25+24+…+1 = 63 ，二进制为： 111 111 。 </p>
+<p>对于命令：pfadd key value<br>在存入时，value 会被 hash 成 64 位，即 64 bit 的比特字符串，前 14 位用来选择这个 value 的比特串中从右往左第一个 1 出现的下标位置数值要存到那个桶中去，即前 14 位用来分桶。设第一个1出现位置的数值为 index 。当 index=5 时，就是: ….10000 [01 0000 0000 0000]<br>之所以选 14位 来表达桶编号是因为，分了 16384 个桶，而 2^14 = 16384，刚好地，最大的时候可以把桶利用完，不造成浪费。假设一个字符串的前 14 位是：00 0000 0000 0010 (从右往左看) ，其十进制值为 2。那么 index 将会被转化后放到编号为 2 的桶。<br>index 的转化规则：<br>首先因为完整的 value 比特字符串是 64 位形式，减去 14 后，剩下 50 位，那么极端情况，出现 1 的位置，是在第 50 位，即位置是 50。此时 index = 50。此时先将 index 转为 2 进制，它是：110010 。<br>因为16384 个桶中，每个桶是 6 bit 组成的。刚好 110010 就被设置到了第 2 号桶中去了。请注意，50 已经是最坏的情况，且它都被容纳进去了。那么其他的不用想也肯定能被容纳进去。<br>因为 fpadd 的 key 可以设置多个 value。例如下面的例子：</p>
+<pre><code>pfadd lgh golang  
+pfadd lgh python  
+pfadd lgh java  </code></pre><p>根据上面的做法，不同的 value，会被设置到不同桶中去，如果出现了在同一个桶的，即前 14 位值是一样的，但是后面出现 1 的位置不一样。那么比较原来的 index 是否比新 index 大。是，则替换。否，则不变。<br>最终地，一个 key 所对应的 16384 个桶都设置了很多的 value 了，每个桶有一个k_max。此时调用 pfcount 时，按照前面介绍的估算方式，便可以计算出 key 的设置了多少次 value，也就是统计值。<br>value 被转为 64 位的比特串，最终被按照上面的做法记录到每个桶中去。64 位转为十进制就是：2^64，HyperLogLog 仅用了：16384 * 6 /8 / 1024 K （12k）存储空间就能统计多达 2^64 个数。  </p>
+<hr>
+<h2 id="布隆过滤器"><a href="#布隆过滤器" class="headerlink" title="布隆过滤器"></a>布隆过滤器</h2><p><strong>应用场景</strong>：用来判断某个value是否已经存在缓存当中，新闻推荐，不给用户推荐已经看过的新闻  </p>
+<pre><code>127.0.0.1:6379&gt; bf.add codehole user1
+(integer) 1
+127.0.0.1:6379&gt; bf.add codehole user2
+(integer) 1
+127.0.0.1:6379&gt; bf.add codehole user3
+(integer) 1
+127.0.0.1:6379&gt; bf.exists codehole user1
+(integer) 1
+127.0.0.1:6379&gt; bf.exists codehole user2
+(integer) 1
+127.0.0.1:6379&gt; bf.exists codehole user3
+(integer) 1
+127.0.0.1:6379&gt; bf.exists codehole user4
+(integer) 0
+127.0.0.1:6379&gt; bf.madd codehole user4 user5 user6
+1) (integer) 1
+2) (integer) 1
+3) (integer) 1
+127.0.0.1:6379&gt; bf.mexists codehole user4 user5 user6 user7
+1) (integer) 1
+2) (integer) 1
+3) (integer) 1
+4) (integer) 0</code></pre><p>对于见过的元素肯定不会误判，对于没见过的元素，有可能会认为已经存在了<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234300.png" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234312.png" alt="">  </p>
+<p>随着元素存储越来越多，那么都会变成1，最后再来啥元素都会判定已经存在了。</p>
+<p><strong>如何选择哈希函数个数和布隆过滤器长度</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234345.png" alt=""><br>k 为哈希函数个数，m 为布隆过滤器长度，n 为插入的元素个数，p 为误报率。</p>
+<hr>
+<h2 id="Redis使用场景"><a href="#Redis使用场景" class="headerlink" title="Redis使用场景"></a>Redis使用场景</h2><p><strong>计数器</strong><br>可以对string进行自增自减运算，实现计数器功能<br>读写性能非常好，很适合存储频繁读写的计数量  </p>
+<p><strong>缓存</strong><br>将热点数据放到内存中，设置内存的最大使用量以及淘汰策略来保证缓存的命中率  </p>
+<p><strong>查找表</strong><br>例如DNS记录就很适合使用Redis进行存储<br>查找表和缓存类似，也是利用了Redis快速查找特性，但是查找表的内容不能失效  </p>
+<p><strong>消息队列</strong><br>List是一个双向链表，可以通过Lpush和rpop写入和读取消息，不过最好使用消息中间件  </p>
+<p><strong>会话缓存</strong><br>可以使用Redis统一存储多台应用服务器的会话信息。当应用服务器不再存储用户的会话信息，也就不再具有状态  </p>
+<p><strong>其他</strong><br>Set可以实现交集，并集等操作。从而实现共同好友等功能。<br>ZSet可以实现有序性操作，实现排行榜功能。</p>
+<hr>
+<h2 id="Redis和Memcached"><a href="#Redis和Memcached" class="headerlink" title="Redis和Memcached"></a>Redis和Memcached</h2><p><strong>数据类型</strong>  </p>
+<p>  Memcached仅支持字符串类型，而Redis支持五种不同的数据类型。<br><strong>数据持久化</strong>  </p>
+<p> Redis支持两种持久化策略：RDB快照和AOF日志，而Memcached不支持持久化。<br><strong>分布式</strong>  </p>
+<p>  Memcached不支持分布式，只能通过客户端使用一致性哈希来实现分布式存储，这种方式在存储和查询时都需要先在客户端计算一次数据所在的节点  </p>
+<p>Redis Cluster实现了分布式的支持<br><strong>内存管理机制</strong>  </p>
+<p>   在Redis中，并不是所有数据都一直存储在内存中，可以将一些很久没用的value交换到磁盘，而Memcached的数据则会一直在内存中。</p>
+<p>Memcached将内存分割成特定长度的块来存储数据，以完全解决内存碎片的问题，但是会使内存利用率不高   </p>
+<hr>
+<h2 id="Redis持久化"><a href="#Redis持久化" class="headerlink" title="Redis持久化"></a>Redis持久化</h2><p><strong>RDB快照</strong><br>RDB是一种快照存储持久化方式，具体就是将Redis某一时刻的内存数据保存到硬盘的文件当中，默认保存的文件名为dump.rdb，而在Redis服务器启动时，会重新加载dump.rdb文件的数据到内存当中恢复数据。如果数据量很大，保存快照的时间会很长  </p>
+<p><strong>AOF日志</strong><br>AOF只记录对内存进行修改的指令记录。<br>假设 AOF 日志记录了自 Redis 实例创建以来所有的修改性指令序列，那么就可以通过对一个空的 Redis 实例顺序执行所有的指令，也就是「重放」，来恢复 Redis 当前实例的内存数据结构的状态。</p>
+<p>Redis 在长期运行的过程中，AOF 的日志会越变越长。如果实例宕机重启，重放整个AOF 日志会非常耗时，导致长时间 Redis 无法对外提供服务。所以需要对 AOF 日志瘦身。  </p>
+<hr>
+<h2 id="数据淘汰策略"><a href="#数据淘汰策略" class="headerlink" title="数据淘汰策略"></a>数据淘汰策略</h2><p>可以设置内存最大使用量，当内存使用量超出时，会施行数据淘汰策略。<br>Redis具体有6种淘汰策略：<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234847.png" alt="">  </p>
+<p>作为内存数据库，出于对性能和内存消耗的考虑，Redis的淘汰算法实际上并非针对所有key，而是抽样一小部分并且从中选出被淘汰的key。  </p>
+<p>为了提高缓存命中率，需要保证缓存数据都是热点数据，可以将内存最大使用量设置为热点数据占用的内存量，然后启用allkeys-lru淘汰策略，将最近最少使用的数据淘汰。</p>
+<hr>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p><strong>基本使用：</strong></p>
+<pre><code>&gt; multi
+OK
+&gt; incr books
+QUEUED #表示指令已经被服务器缓存到队列里了
+&gt; incr books
+QUEUED
+&gt; exec
+(integer) 1
+(integer) 2</code></pre><p>所有的指令在exec之前不执行，而是缓存在服务器的一个事务队列中，服务器一旦收到exec指令，才开始执行整个事务队列，执行完毕一次性返回所有指令的运行结果。</p>
+<p>Redis事务不支持原子性只是保证了事务的隔离性：实验如下  </p>
+<pre><code>127.0.0.1:6379&gt; multi
+OK
+127.0.0.1:6379&gt; set books iamastring
+QUEUED
+127.0.0.1:6379&gt; incr books
+QUEUED
+127.0.0.1:6379&gt; set poorman iamdesperate
+QUEUED
+127.0.0.1:6379&gt; exec
+1) OK
+2) (error) ERR value is not an integer or out of range
+3) OK
+127.0.0.1:6379&gt; get poorman
+&quot;iamdesperate&quot;
+127.0.0.1:6379&gt; get books
+&quot;iamastring&quot;</code></pre><hr>
+<h2 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h2><blockquote>
+<p>Redis服务器是一个事件驱动程序。   </p>
+</blockquote>
+<p><strong>文件事件</strong><br>服务器通过套接字与客户端或者其它服务器进行通信，文件事件就是对套接字操作的抽象。 </p>
+<p>Redis <strong>基于 Reactor 模式</strong>开发了自己的网络事件处理器，使用 I/O 多路复用程序来同时监听多个套接字，并将到达的<br>事件传送给文件事件分派器，分派器会根据套接字产生的事件类型调用相应的事件处理器。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235037.png" alt="">  </p>
+<p><strong>时间事件</strong><br>服务器有一些操作需要在给定的时间点执行，时间事件是对这类定时操作的抽象  </p>
+<p><strong>定时事件</strong>：让一段程序在指定的时间内执行一次<br><strong>周期性事件</strong>：每隔指定时间就执行一次<br>Redis将所有的时间事件都放在一个无序链表中，通过遍历整个链表查找出已到达的时间事件，并调用相应的事件处理器。<br><strong>事件的调度与执行</strong><br>服务器需要不断监听文件事件的套接字才能得到待处理的文件事件，但是不能一直监听，否则时间事件无法在规定的时间内执行，因此监听时间应该根据距离现在最近的时间事件来决定。 </p>
+<pre><code>def aeProcessEvents():
+# 获取到达时间离当前时间最接近的时间事件
+time_event = aeSearchNearestTimer()
+# 计算最接近的时间事件距离到达还有多少毫秒
+remaind_ms = time_event.when - unix_ts_now()
+# 如果事件已到达，那么 remaind_ms 的值可能为负数，将它设为 0
+if remaind_ms &lt; 0:
+remaind_ms = 0
+# 根据 remaind_ms 的值，创建 timeval
+timeval = create_timeval_with_ms(remaind_ms)
+# 阻塞并等待文件事件产生，最大阻塞时间由传入的 timeval 决定
+aeApiPoll(timeval)
+# 处理所有已产生的文件事件
+procesFileEvents()
+# 处理所有已到达的时间事件
+processTimeEvents()</code></pre><p>从事件处理的角度看服务器的执行流程：<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235135.png" alt="">  </p>
+<hr>
+<h2 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h2><p>使用slaveof host port命令来让一个服务器成为另一个服务器的从服务器<br>**<br>支持主从复制和从从复制**</p>
+<p><strong>CAP原理：</strong>网络分区发生时，一致性和可用性两难全  </p>
+<p><strong>网络分区：</strong>例如两台分布式系统中的机器节点之间的网络断开了</p>
+<p><strong>最终一致：</strong><br>    Redis的主从数据是异步同步的，所以分布式的Redis系统并不满足一致性要求。当客户端在Redis的主节点修改了数据以后，立即返回，即使在主从网络断开的情况下，主节点依旧可以正常对外提供修改服务，所以Redis满足可用性。<br>    但是Redis保证最终一致性，从节点会追赶主节点，最终从节点的状态会和主节点保持一致。如果网络断开了，主从节点的数据将会出现大量不一致，一旦网络恢复，从节点会采用多种策略努力追赶上落后的数据，继续尽力保持和主节点一致。  </p>
+<p><strong>主从同步：</strong>  </p>
+<p>  <strong>增量同步：</strong><br>Redis 同步的是指令流，主节点会将那些对自己的状态产生修改性影响的指令记录在本地的内存 buffer 中，然后异步将 buffer 中的指令同步到从节点，从节点一边执行同步的指令流来达到和主节点一样的状态，一遍向主节点反馈自己同步到哪里了 (偏移量)。<br>因为内存的 buffer 是有限的，所以 Redis 主库不能将所有的指令都记录在内存 buffer<br>中。Redis 的复制内存 buffer 是一个定长的环形数组，如果数组内容满了，就会从头开始覆盖前面的内容。如果因为网络状况不好，从节点在短时间内无法和主节点进行同步，那么当网络状况恢复时，Redis 的主节点中那些没有同步的指令在 buffer 中有可能已经被后续的指令覆盖掉了，从节点将无法直接通过指令流来进行同步，这个时候就需要用到更加复杂的同步机制 — 快照同步。 </p>
+<p><strong>快照同步：</strong><br>快照同步是一个非常耗费资源的操作，它首先需要在主库上进行一次 bgsave 将当前内存的数据全部快照到磁盘文件中，然后再将快照文件的内容全部传送到从节点。从节点将快照文件接受完毕后，立即执行一次全量加载，加载之前先要将当前内存的数据清空。加载完毕后通知主节点继续进行增量同步。在整个快照同步进行的过程中，主节点的复制 buffer 还在不停的往前移动，如果快照同步的时间过长或者复制 buffer 太小，都会导致同步期间的增量指令在复制 buffer 中被覆盖，这样就会导致快照同步完成后无法进行增量复制，然后会再次发起快照同步，如此极有可能会陷入快照同步的死循环。  </p>
+<p>所以务必配置一个合适的复制 buffer 大小参数，避免快照复制的死循环。</p>
+<hr>
+<h2 id="Sentinel-–哨兵"><a href="#Sentinel-–哨兵" class="headerlink" title="Sentinel –哨兵"></a>Sentinel –哨兵</h2><p><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235341.png" alt="">  </p>
+<p>我们可以将 Redis Sentinel 集群看成是一个 ZooKeeper 集群，它是集群高可用的心脏，它一般是由 3～5 个节点组成，这样挂了个别节点集群还可以正常运转。它负责持续监控主从节点的健康，当主节点挂掉时，自动选择一个最优的从节点切换为主节点。客户端来连接集群时，会首先连接 sentinel，通过 sentinel 来查询主节点的地址，然后再去连接主节点进行数据交互。当主节点发生故障时，客户端会重新向 sentinel 要地址，sentinel 会将最新的主节点地址告诉客户端。如此应用程序将无需重启即可自动完成节点切换。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235401.png" alt="">  </p>
+<p>主节点挂掉了，原先的主从复制也断开了，客户端和损坏的主节点也断开了。从节点被提升为新的主节点，其它从节点开始和新的主节点建立复制关系。客户端通过新的主节点继续进行交互。Sentinel 会持续监控已经挂掉了主节点，待它恢复后，集群会调整为下面这张图。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235423.png" alt="">  </p>
+<hr>
+<h2 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h2><p><strong>客户端分片</strong>客户端使用一致性哈希等算法决定键应该分布到哪个节点上<br><strong>代理分片</strong>：将客户端请求发送到代理上，由代理转发请求到正确的节点上<br><strong>服务器分片</strong>：Redis Cluster  </p>
 
   </article>
 </div>
