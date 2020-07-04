@@ -313,28 +313,12 @@
 <p>比如，以计算机学院和软件学院。  </p>
 <p>其中pre[]数组的意思是 例如<strong>pre[3]=15,就意味着3这个人的领导是15</strong>，院长在这个院里的领导只能是自己，比如<strong>pre[4]=4,就为大院长，同时也就是一棵树的根节点</strong>  </p>
 <p>Union算法：</p>
-<pre><code>int unionsearch(int root) //查找根结点
-{
-    int son, tmp;
-    son = root;
-    while(root != pre[root]) //我的上级不是我们的院长，不停的往上走，知道找到院长未知
-        root = pre[root];
-    while(son != root) //路径压缩算法
-    {
-        tmp = pre[son];
-        pre[son] = root;
-        son = tmp;
-    }
-    return root; //大领导
-}    </code></pre><p><strong>join算法</strong>：其实就是从两个院随机选两个人，根据他们找到两个院的最大领导，两个大领导中再随机选一个当另一个部门的副院长      </p>
-<pre><code>void join(int root1, int root2) //虚竹和周芷若做朋友
-{
-    int x, y;
-    x = unionsearch(root1);//我老大是玄慈
-    y = unionsearch(root2);//我老大是灭绝
-    if(x != y) 
-        pre[x] = y; //打一仗，谁赢就当对方老大
-}</code></pre><p><strong>路径压缩算法：</strong>  对于随机的两个人来说，如果老要这样一直往上找自己的领导太过麻烦，所以路径压缩算法就是直接让院长统领所有人，这样的话，每个人就能很快的跟着院长走。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200630153316.png" alt=""></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">unionsearch</span><span class="params">(<span class="keyword">int</span> root)</span> <span class="comment">//查找根结点</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> son, tmp;</span><br><span class="line">	son = root;</span><br><span class="line">	<span class="keyword">while</span>(root != pre[root]) <span class="comment">//我的上级不是我们的院长，不停的往上走，知道找到院长未知</span></span><br><span class="line">		root = pre[root];</span><br><span class="line">	<span class="keyword">while</span>(son != root) <span class="comment">//路径压缩算法</span></span><br><span class="line">	&#123;</span><br><span class="line">		tmp = pre[son];</span><br><span class="line">		pre[son] = root;</span><br><span class="line">		son = tmp;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> root; <span class="comment">//大领导</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>join算法</strong>：其实就是从两个院随机选两个人，根据他们找到两个院的最大领导，两个大领导中再随机选一个当另一个部门的副院长      </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">join</span><span class="params">(<span class="keyword">int</span> root1, <span class="keyword">int</span> root2)</span> <span class="comment">//虚竹和周芷若做朋友</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> x, y;</span><br><span class="line">	x = unionsearch(root1);<span class="comment">//我老大是玄慈</span></span><br><span class="line">	y = unionsearch(root2);<span class="comment">//我老大是灭绝</span></span><br><span class="line">	<span class="keyword">if</span>(x != y) </span><br><span class="line">		pre[x] = y; <span class="comment">//打一仗，谁赢就当对方老大</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>路径压缩算法：</strong>  对于随机的两个人来说，如果老要这样一直往上找自己的领导太过麻烦，所以路径压缩算法就是直接让院长统领所有人，这样的话，每个人就能很快的跟着院长走。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200630153316.png" alt=""></p>
 
   </article>
 </div>

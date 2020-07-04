@@ -151,57 +151,14 @@
 <p>Value的结构不一样  </p>
 </blockquote>
 <p>redis对象头：</p>
-<pre><code>struct RedisObject{
-    int4 type;//4 bits 
-    int4 encoding;//4 bits
-    int24 lru;//24bits
-    int32 refcount;//4bytes
-    void *ptr;//8bytes,64-bit system,指向对象内容的具体存储位置
-}</code></pre><h2 id="string（字符串）"><a href="#string（字符串）" class="headerlink" title="string（字符串）##"></a>string（字符串）##</h2><pre><code>动态字符串，相当于java中的ArrayList,但仅仅是动态上相似。</code></pre><p><strong>扩容规则：</strong><br>当字符串长度小于1M时，扩容是直接加倍现有空间，超过1M时一次只会多扩1M的空间，最大长度为512M  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">RedisObject</span>&#123;</span></span><br><span class="line"> int4 type;<span class="comment">//4 bits </span></span><br><span class="line"> int4 encoding;<span class="comment">//4 bits</span></span><br><span class="line"> int24 lru;<span class="comment">//24bits</span></span><br><span class="line"> int32 refcount;<span class="comment">//4bytes</span></span><br><span class="line"> <span class="keyword">void</span> *ptr;<span class="comment">//8bytes,64-bit system,指向对象内容的具体存储位置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="string（字符串）"><a href="#string（字符串）" class="headerlink" title="string（字符串）##"></a>string（字符串）##</h2><pre><code>动态字符串，相当于java中的ArrayList,但仅仅是动态上相似。</code></pre><p><strong>扩容规则：</strong><br>当字符串长度小于1M时，扩容是直接加倍现有空间，超过1M时一次只会多扩1M的空间，最大长度为512M  </p>
 <p><strong>键值对 get set</strong> </p>
-<pre><code>&gt; set name codehole
-OK
-&gt; get name
-&quot;codehole&quot;
-&gt; exits name
-(error) ERR unknown command &apos;exits&apos;
-&gt; exists name
-(integer) 1
-&gt; del name
-(integer) 1
-&gt; get name
-(nil)  </code></pre><p><strong>批量键值对 mget  mset</strong>  </p>
-<pre><code>  &gt; mget name1 name2 name3 #返回一个链表
-1) &quot;codehole&quot;
-2) &quot;holycoder&quot;
-3) (nil)
-&gt; mset name1 boy name2 girl name3 unknown
-OK
-&gt; mget name1 name2 name3
-1) &quot;boy&quot;
-2) &quot;girl&quot;
-3) &quot;unknown&quot;  </code></pre><p><strong>过期和set命令扩展</strong>  </p>
-<pre><code>&gt; set name Aurthur
-OK
-&gt; get name
-&quot;Aurthur&quot;
-&gt; expire name 5
-(integer) 1
-&gt; get name
-(nil)
-&gt; setex name 5 Authur  #相当于set+expire
-OK
-&gt; get name
-(nil)
-&gt; setnx name codehole # 相当于set if not exists
-(integer) 1
-&gt; get name
-&quot;codehole&quot;
-&gt; setnx name Aurthur
-(integer) 0</code></pre><p><strong>计数：如果value是个整数，还可以对它进行自增操作。</strong>  </p>
-<blockquote>
-<p>自增范围：signed long的范围：[-2^31, 2^31-1]，超过这个值会报错</p>
-</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="built_in">set</span> name codehole</span><br><span class="line">OK</span><br><span class="line">&gt; <span class="built_in">get</span> name</span><br><span class="line"><span class="string">"codehole"</span></span><br><span class="line">&gt; exits name</span><br><span class="line">(error) ERR unknown command 'exits'</span><br><span class="line">&gt; <span class="built_in">exists</span> name</span><br><span class="line">(integer) <span class="number">1</span></span><br><span class="line">&gt; del name</span><br><span class="line">(integer) <span class="number">1</span></span><br><span class="line">&gt; <span class="built_in">get</span> name</span><br><span class="line">(nil)</span><br></pre></td></tr></table></figure>
+<p><strong>批量键值对 mget  mset</strong>  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  &gt; mget name1 name2 name3 #返回一个链表</span><br><span class="line"><span class="number">1</span>) <span class="string">"codehole"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"holycoder"</span></span><br><span class="line"><span class="number">3</span>) (nil)</span><br><span class="line">&gt; mset name1 boy name2 girl name3 unknown</span><br><span class="line">OK</span><br><span class="line">&gt; mget name1 name2 name3</span><br><span class="line"><span class="number">1</span>) <span class="string">"boy"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"girl"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"unknown"</span></span><br></pre></td></tr></table></figure>
+<p><strong>过期和set命令扩展</strong>  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">    &gt; <span class="built_in">set</span> name Aurthur</span><br><span class="line">    OK</span><br><span class="line">    &gt; <span class="built_in">get</span> name</span><br><span class="line">    <span class="string">"Aurthur"</span></span><br><span class="line">    &gt; expire name <span class="number">5</span></span><br><span class="line">    (integer) <span class="number">1</span></span><br><span class="line">    &gt; <span class="built_in">get</span> name</span><br><span class="line">    (nil)</span><br><span class="line">    &gt; setex name <span class="number">5</span> Authur  #相当于<span class="built_in">set</span>+expire</span><br><span class="line">    OK</span><br><span class="line">    &gt; <span class="built_in">get</span> name</span><br><span class="line">    (nil)</span><br><span class="line">    &gt; setnx name codehole # 相当于<span class="built_in">set</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">exists</span></span><br><span class="line">    (integer) <span class="number">1</span></span><br><span class="line">    &gt; <span class="built_in">get</span> name</span><br><span class="line">    <span class="string">"codehole"</span></span><br><span class="line">    &gt; setnx name Aurthur</span><br><span class="line">    (integer) <span class="number">0</span></span><br><span class="line">```	</span><br><span class="line">**计数：如果value是个整数，还可以对它进行自增操作。**  </span><br><span class="line">&gt;自增范围：<span class="keyword">signed</span> <span class="keyword">long</span>的范围：[<span class="number">-2</span>^<span class="number">31</span>, <span class="number">2</span>^<span class="number">31</span><span class="number">-1</span>]，超过这个值会报错</span><br></pre></td></tr></table></figure>
 <pre><code>&gt; set age 30
 OK
 &gt; incr age
@@ -209,25 +166,14 @@ OK
 &gt; incrby age 5
 (integer) 36
 &gt; incrby age -7
-(integer) 29</code></pre><h2 id="字符串内部结构："><a href="#字符串内部结构：" class="headerlink" title="字符串内部结构："></a>字符串内部结构：</h2><p>Redis 的字符串叫着<strong>「SDS」</strong>，也就是 <strong>Simple Dynamic String</strong>。它的结构是一个带长度信息的字节数组。    </p>
+(integer) 29</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">## 字符串内部结构： ##</span><br><span class="line">Redis 的字符串叫着**「SDS」**，也就是 **Simple Dynamic String**。它的结构是一个带长度信息的字节数组。</span><br></pre></td></tr></table></figure>
 <pre><code>struct SDS&lt;T&gt; {
     T capacity; // 数组容量，用泛型是因为为了节约内存，容量很小的时候用short和byte
     T len; // 数组长度
     T free;
     byte flags; // 特殊标识位，不理睬它
     byte[] content; // 数组内容
-}  </code></pre><p>其中SDS和C字符串的区别:<br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard.png" alt=""> </p>
-<p><strong>长度很短的时候使用emb形式存储，当长度超过44时是用raw存储。</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/16760" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/16762" alt=""><br>有了raw后为什么还会有embstr的编码方式？  </p>
-<p>因为embstr的编码方式有一些优点：  ‘</p>
-<ol>
-<li>embstr将创建字符串对象所需的内存分配次数从raw编码的两次降低为一次 </li>
-<li>释放embstr的字符串只需要调用一次内存释放函数，而释放raw编码的字符串对象需要调用两次内存释放函数</li>
-</ol>
-<hr>
-<h2 id="list（列表）"><a href="#list（列表）" class="headerlink" title="list（列表）"></a>list（列表）</h2><blockquote>
-<p>相当于java里的LinkedList–链表。当最后一个元素被弹出，list自动被删除，内存被回收  </p>
-</blockquote>
-<p>右边进左边出：队列   </p>
+}  </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">其中SDS和C字符串的区别:  </span><br><span class="line">![](https:&#x2F;&#x2F;gitee.com&#x2F;guoer03&#x2F;picimg&#x2F;raw&#x2F;master&#x2F;clipboard.png) </span><br><span class="line"></span><br><span class="line">**长度很短的时候使用emb形式存储，当长度超过44时是用raw存储。**  </span><br><span class="line">![](https:&#x2F;&#x2F;gitee.com&#x2F;guoer03&#x2F;picimg&#x2F;raw&#x2F;master&#x2F;16760)  </span><br><span class="line">![](https:&#x2F;&#x2F;gitee.com&#x2F;guoer03&#x2F;picimg&#x2F;raw&#x2F;master&#x2F;16762)  </span><br><span class="line">有了raw后为什么还会有embstr的编码方式？  </span><br><span class="line">    </span><br><span class="line">因为embstr的编码方式有一些优点：  &#39;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">1. embstr将创建字符串对象所需的内存分配次数从raw编码的两次降低为一次 </span><br><span class="line">2. 释放embstr的字符串只需要调用一次内存释放函数，而释放raw编码的字符串对象需要调用两次内存释放函数</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">----------</span><br><span class="line"></span><br><span class="line">## list（列表） ##</span><br><span class="line">	</span><br><span class="line">&gt;相当于java里的LinkedList--链表。当最后一个元素被弹出，list自动被删除，内存被回收  </span><br><span class="line"></span><br><span class="line">右边进左边出：队列</span><br></pre></td></tr></table></figure>
 <pre><code>&gt; rpush books python java golang
 (integer) 3
 &gt; llen books
@@ -239,7 +185,7 @@ OK
 &gt; lpop books
 &quot;golang&quot;
 &gt; exists books
-(integer) 0  </code></pre><p>右边进左边出：栈   </p>
+(integer) 0  </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">右边进左边出：栈</span><br></pre></td></tr></table></figure>
 <pre><code>&gt; rpush books python java golang
 (integer) 3
 &gt; rpop books
@@ -251,13 +197,7 @@ OK
 &gt; rpop books
 (nil)
 &gt; exists books
-(integer) 0  </code></pre><p><strong>慢操作</strong>  </p>
-<ul>
-<li><strong>lindex</strong>相当于Java链表中的get(int index)方法,时间复杂度O(n)</li>
-<li><strong>ltrim</strong>两个参数start_index和end_index定义了一个区间，其他的都删掉  </li>
-<li><strong>index</strong>可以为负数，-1位倒数第一个元素  </li>
-</ul>
-<hr>
+(integer) 0  </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">**慢操作**  </span><br><span class="line"></span><br><span class="line">- **lindex**相当于Java链表中的get(int index)方法,时间复杂度O(n)</span><br><span class="line">- **ltrim**两个参数start_index和end_index定义了一个区间，其他的都删掉  </span><br><span class="line">- **index**可以为负数，-1位倒数第一个元素  </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">----------</span><br></pre></td></tr></table></figure>
 <pre><code>&gt; rpush books python java golang  
 (integer) 3  
 &gt; lindex books 1  
@@ -269,42 +209,18 @@ OK
 &gt; ltrim books 1 0  
 OK  
 &gt; exists books  
-(integer) 0  </code></pre><p><strong>list的具体实现：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(3).png" alt=""><br>元素较少时：是用ziplist，紧挨在一起。  </p>
+(integer) 0  </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">**list的具体实现：**</span><br><span class="line">![](https:&#x2F;&#x2F;gitee.com&#x2F;guoer03&#x2F;picimg&#x2F;raw&#x2F;master&#x2F;clipboard%20(3).png)  </span><br><span class="line">元素较少时：是用ziplist，紧挨在一起。</span><br></pre></td></tr></table></figure>
 <pre><code>127.0.0.1:6379&gt; rpush books java python cpp golang
 (integer) 4
 127.0.0.1:6379&gt; debug object books
-Value at:00007FF1070027C0 refcount:1 encoding:ziplist serializedlength:39 lru:15949445 lru_seconds_idle:14  </code></pre><p>当数据量很多时—<strong>quicklist</strong>，普通链表需要的指针占用太大空间，会加重内存的碎片化。quicklist里的每个ziplist都有一个prev和next指针。  </p>
-<p><strong>压缩列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(4).png" alt="">  </p>
-<pre><code>struct ziplist&lt;T&gt;{
-    int32 zlbytes;//整个压缩列表占用字节数
-    int32 zltail_offset;//最后一个元素距离列表起始位置的偏移量，用于快速定位到最后一个节点
-    int16 zllength;//元素个数
-    T[] entries;//元素内容列表，挨个挨个紧凑存储
-    int8 zlend;//标志压缩列表的结束，值恒为0xFF
-}  </code></pre><hr>
-<pre><code>struct entry{
-    int&lt;var&gt; prelen//前一个entry的字节长度
-    int&lt;var&gt; encoding; // 元素类型编码
-    optional byte[] content; // 元素内容
-}  </code></pre><p>它的 <strong>prevlen</strong> 字段表示前一个 entry 的字节长度，当压缩列表倒着遍历时，需要通过这个字段来快速定位到下一个元素的位置。它是一个变长的整数，当字符串长度小于254(0xFE) 时，使用一个字节表示；如果达到或超出 254(0xFE) 那就使用 5 个字节来表<br>示。  </p>
+Value at:00007FF1070027C0 refcount:1 encoding:ziplist serializedlength:39 lru:15949445 lru_seconds_idle:14  </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">当数据量很多时---**quicklist**，普通链表需要的指针占用太大空间，会加重内存的碎片化。quicklist里的每个ziplist都有一个prev和next指针。  </span><br><span class="line"></span><br><span class="line">**压缩列表：**  </span><br><span class="line">![](https:&#x2F;&#x2F;gitee.com&#x2F;guoer03&#x2F;picimg&#x2F;raw&#x2F;master&#x2F;clipboard%20(4).png)  </span><br><span class="line">&#96;&#96;&#96;C</span><br><span class="line">    struct ziplist&lt;T&gt;&#123;</span><br><span class="line">	    int32 zlbytes;&#x2F;&#x2F;整个压缩列表占用字节数</span><br><span class="line">	    int32 zltail_offset;&#x2F;&#x2F;最后一个元素距离列表起始位置的偏移量，用于快速定位到最后一个节点</span><br><span class="line">	    int16 zllength;&#x2F;&#x2F;元素个数</span><br><span class="line">	    T[] entries;&#x2F;&#x2F;元素内容列表，挨个挨个紧凑存储</span><br><span class="line">	    int8 zlend;&#x2F;&#x2F;标志压缩列表的结束，值恒为0xFF</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span>&#123;</span></span><br><span class="line"> <span class="keyword">int</span>&lt;var&gt; prelen<span class="comment">//前一个entry的字节长度</span></span><br><span class="line"> <span class="keyword">int</span>&lt;var&gt; encoding; <span class="comment">// 元素类型编码</span></span><br><span class="line"> optional <span class="keyword">byte</span>[] content; <span class="comment">// 元素内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它的 <strong>prevlen</strong> 字段表示前一个 entry 的字节长度，当压缩列表倒着遍历时，需要通过这个字段来快速定位到下一个元素的位置。它是一个变长的整数，当字符串长度小于254(0xFE) 时，使用一个字节表示；如果达到或超出 254(0xFE) 那就使用 5 个字节来表<br>示。  </p>
 <p><strong>快速列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(5).png" alt="">  </p>
-<pre><code>struct quicklistNode {
-    quicklistNode* prev;
-    quicklistNode* next;
-    ziplist* zl; // 指向压缩列表
-    int32 size; // ziplist 的字节总数
-    int16 count; // ziplist 中的元素数量
-    int2 encoding; // 存储形式 2bit，原生字节数组还是 LZF 压缩存储
-    ...
-}
-struct quicklist {
-    quicklistNode* head;
-    quicklistNode* tail;
-    long count; // 元素总数
-    int nodes; // ziplist 节点的个数
-    int compressDepth; // LZF 算法压缩深度
-    ...
-}  </code></pre><p><strong>每个ziplist存多少元素？</strong>   </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">quicklistNode</span> &#123;</span></span><br><span class="line"> quicklistNode* prev;</span><br><span class="line"> quicklistNode* next;</span><br><span class="line"> ziplist* zl; <span class="comment">// 指向压缩列表</span></span><br><span class="line"> int32 <span class="built_in">size</span>; <span class="comment">// ziplist 的字节总数</span></span><br><span class="line"> int16 count; <span class="comment">// ziplist 中的元素数量</span></span><br><span class="line"> int2 encoding; <span class="comment">// 存储形式 2bit，原生字节数组还是 LZF 压缩存储</span></span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">quicklist</span> &#123;</span></span><br><span class="line"> quicklistNode* head;</span><br><span class="line"> quicklistNode* tail;</span><br><span class="line"> <span class="keyword">long</span> count; <span class="comment">// 元素总数</span></span><br><span class="line"> <span class="keyword">int</span> nodes; <span class="comment">// ziplist 节点的个数</span></span><br><span class="line"> <span class="keyword">int</span> compressDepth; <span class="comment">// LZF 算法压缩深度</span></span><br><span class="line"> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>每个ziplist存多少元素？</strong>   </p>
 <blockquote>
 <p>quicklist 内部默认单个 ziplist 长度为 8k 字节，超出了这个字节数，就会新起一个<br>ziplist。ziplist 的长度由配置参数 list-max-ziplist-size 决定。  </p>
 </blockquote>
@@ -319,29 +235,8 @@ struct quicklist {
 <p>rehash操作有所不同：先看hashmap中的rehash：<strong>一次性全部rehash</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(6).png" alt="">  </p>
 <p>而redis为了性能，不堵塞服务，采用了<strong>渐进式hash策略</strong>：  </p>
 <p><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(7).png" alt=""><br>渐进式 rehash 会在 rehash 的同时，保留新旧两个 hash 结构，查询时会同时查询两个hash 结构，然后后续循序渐进地将旧 hash 的内容一点点迁移到新的 hash 结构中。</p>
-<pre><code>&gt; hset books java &quot;think in java&quot; # 命令行的字符串如果包含空格，要用引号括起来
-(integer) 1
-&gt; hset books golang &quot;concurrency in go&quot;
-(integer) 1
-&gt; hset books python &quot;python cookbook&quot;
-(integer) 1
-&gt; hgetall books # entries()，key 和 value 间隔出现
-1) &quot;java&quot;
-2) &quot;think in java&quot;
-3) &quot;golang&quot;
-4) &quot;concurrency in go&quot;
-5) &quot;python&quot;
-6) &quot;python cookbook&quot;
-&gt; hlen books
-(integer) 3
-&gt; hget books java
-&quot;think in java&quot;
-&gt; hset books golang &quot;learning go programming&quot; # 因为是更新操作，所以返回 0
-(integer) 0
-&gt; hget books golang &quot;learning go programming&quot;
-&gt; hmset books java &quot;effective java&quot; python &quot;learning python&quot; golang &quot;modern golang
-programming&quot; # 批量 set
-OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(8).png" alt=""><br><strong>hash函数：</strong>siphash：即使在输入key很小的情况下，也可以产生随机性特别好的输出  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&gt; hset books java &quot;think in java&quot; # 命令行的字符串如果包含空格，要用引号括起来</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; hset books golang &quot;concurrency in go&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; hset books python &quot;python cookbook&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; hgetall books # entries()，key 和 value 间隔出现</span><br><span class="line">1) &quot;java&quot;</span><br><span class="line">2) &quot;think in java&quot;</span><br><span class="line">3) &quot;golang&quot;</span><br><span class="line">4) &quot;concurrency in go&quot;</span><br><span class="line">5) &quot;python&quot;</span><br><span class="line">6) &quot;python cookbook&quot;</span><br><span class="line">&gt; hlen books</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; hget books java</span><br><span class="line">&quot;think in java&quot;</span><br><span class="line">&gt; hset books golang &quot;learning go programming&quot; # 因为是更新操作，所以返回 0</span><br><span class="line">(integer) 0</span><br><span class="line">&gt; hget books golang &quot;learning go programming&quot;</span><br><span class="line">&gt; hmset books java &quot;effective java&quot; python &quot;learning python&quot; golang &quot;modern golang</span><br><span class="line">programming&quot; # 批量 set</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+<p><strong>hash表-内部结构：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(8).png" alt=""><br><strong>hash函数：</strong>siphash：即使在输入key很小的情况下，也可以产生随机性特别好的输出  </p>
 <p><strong>hash攻击：</strong>hash函数如果具有偏向性，黑客就可能利用偏向性对服务器进行攻击，因为这样的hash函数会导致hash第二维链表长度极为不均匀，甚至所有的计算元素集中到个别链表中</p>
 <p>扩容条件：当hash表中元素等于第一维数组的长度时就会开始扩容，新数组是原来的两倍，如果Redis正在bgsave，就尽量不扩容，但是hash表元素个数如果达到了第一维数组的五倍以上，就会强制扩容</p>
 <p><strong>缩容条件：</strong>元素个数低于数组长度的10%，缩容时不会考虑Redis是否在做bgsave。</p>
@@ -351,40 +246,8 @@ OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https:
 <p>根据score对value进行排序： zset 可以用来存粉丝列表，value 值是粉丝的用户 ID，score 是关注时间。我们可以对粉丝列表按关注时间进行排序。  </p>
 </blockquote>
 <p>语法：    </p>
-<pre><code>&gt; zadd books 9.0 &quot;think in java&quot;
-(integer) 1
-&gt; zadd books 8.9 &quot;java concurrency&quot;
-(integer) 1
-&gt; zadd books 8.6 &quot;java cookbook&quot;
-(integer) 1
-&gt; zrange books 0 -1 # 按 score 排序列出，参数区间为排名范围
-1) &quot;java cookbook&quot;
-2) &quot;java concurrency&quot;
-3) &quot;think in java&quot;
-&gt; zrevrange books 0 -1 # 按 score 逆序列出，参数区间为排名范围
-1) &quot;think in java&quot;
-2) &quot;java concurrency&quot;
-3) &quot;java cookbook&quot;
-&gt; zcard books # 相当于 count()
-(integer) 3
-&gt; zscore books &quot;java concurrency&quot; # 获取指定 value 的 score
-&quot;8.9000000000000004&quot; # 内部 score 使用 double 类型进行存储，所以存在小数点精度问题
-&gt; zrank books &quot;java concurrency&quot; # 排名
-(integer) 1
-&gt; zrangebyscore books 0 8.91 # 根据分值区间遍历 zset
-1) &quot;java cookbook&quot;
-2) &quot;java concurrency&quot;
-&gt; zrangebyscore books -inf 8.91 withscores # 根据分值区间 (-∞, 8.91] 遍历 zset，同时返
-回分值。inf 代表 infinite，无穷大的意思。
-1) &quot;java cookbook&quot;
-2) &quot;8.5999999999999996&quot;
-3) &quot;java concurrency&quot;
-4) &quot;8.9000000000000004&quot;
-&gt; zrem books &quot;java concurrency&quot; # 删除 value
-(integer) 1
-&gt; zrange books 0 -1
-1) &quot;java cookbook&quot;
-2) &quot;think in java&quot;  </code></pre><p><strong>跳跃列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(9).png" alt="">  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&gt; zadd books 9.0 &quot;think in java&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd books 8.9 &quot;java concurrency&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zadd books 8.6 &quot;java cookbook&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zrange books 0 -1 # 按 score 排序列出，参数区间为排名范围</span><br><span class="line">1) &quot;java cookbook&quot;</span><br><span class="line">2) &quot;java concurrency&quot;</span><br><span class="line">3) &quot;think in java&quot;</span><br><span class="line">&gt; zrevrange books 0 -1 # 按 score 逆序列出，参数区间为排名范围</span><br><span class="line">1) &quot;think in java&quot;</span><br><span class="line">2) &quot;java concurrency&quot;</span><br><span class="line">3) &quot;java cookbook&quot;</span><br><span class="line">&gt; zcard books # 相当于 count()</span><br><span class="line">(integer) 3</span><br><span class="line">&gt; zscore books &quot;java concurrency&quot; # 获取指定 value 的 score</span><br><span class="line">&quot;8.9000000000000004&quot; # 内部 score 使用 double 类型进行存储，所以存在小数点精度问题</span><br><span class="line">&gt; zrank books &quot;java concurrency&quot; # 排名</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zrangebyscore books 0 8.91 # 根据分值区间遍历 zset</span><br><span class="line">1) &quot;java cookbook&quot;</span><br><span class="line">2) &quot;java concurrency&quot;</span><br><span class="line">&gt; zrangebyscore books -inf 8.91 withscores # 根据分值区间 (-∞, 8.91] 遍历 zset，同时返</span><br><span class="line">回分值。inf 代表 infinite，无穷大的意思。</span><br><span class="line">1) &quot;java cookbook&quot;</span><br><span class="line">2) &quot;8.5999999999999996&quot;</span><br><span class="line">3) &quot;java concurrency&quot;</span><br><span class="line">4) &quot;8.9000000000000004&quot;</span><br><span class="line">&gt; zrem books &quot;java concurrency&quot; # 删除 value</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; zrange books 0 -1</span><br><span class="line">1) &quot;java cookbook&quot;</span><br><span class="line">2) &quot;think in java&quot;</span><br></pre></td></tr></table></figure>
+<p><strong>跳跃列表：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/clipboard%20(9).png" alt="">  </p>
 <p><strong>查找步骤：</strong><br>    查找的步骤是从头节点的顶层开始，查到第一个大于指定元素的节点时，退回上一节点，在下一层继续查找。<br>例如我们要在上面的列表中查询16。</p>
 <ul>
 <li>从头节点的最顶层开始，先到节点7。</li>
@@ -405,16 +268,7 @@ OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https:
 <p>zset 中所有的 score 值都是一样的，zset 的查找性能会退化为<br>O(n) 么？Redis 作者自然考虑到了这一点，所以 zset 的排序元素不只看 score 值，如果score 值相同还需要再比较 value 值 (字符串比较)。  </p>
 </blockquote>
 <p><strong>元素排名：</strong><br>  给每一个 forward 指针都增加了 span 属性，span 是「跨度」的意思，表示从前一个节点沿着当前层的 forward 指针跳到当前这个节点中间会跳过多少个节点。  </p>
-<pre><code>struct zslforward {
-    zslnode* item;
-    long span; // 跨度
-}  </code></pre><blockquote>
-<p>这样当我们要计算一个元素的排名时，只需要将「搜索路径」上的经过的所有节点的跨度 span 值进行叠加就可以算出元素的最终 rank 值。   </p>
-</blockquote>
-<hr>
-<h2 id="HyperLogLog"><a href="#HyperLogLog" class="headerlink" title="HyperLogLog:"></a>HyperLogLog:</h2><blockquote>
-<p>提供不精确的去重计数方案</p>
-</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zslforward</span> &#123;</span></span><br><span class="line">	    zslnode* item;</span><br><span class="line">	    <span class="keyword">long</span> span; <span class="comment">// 跨度</span></span><br><span class="line">    &#125;</span><br><span class="line">```  </span><br><span class="line">&gt; 这样当我们要计算一个元素的排名时，只需要将「搜索路径」上的经过的所有节点的跨度 span 值进行叠加就可以算出元素的最终 rank 值。   </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">----------</span><br><span class="line">## HyperLogLog: ##</span><br><span class="line">&gt;提供不精确的去重计数方案</span><br></pre></td></tr></table></figure>
 <pre><code>127.0.0.1:6379&gt; pfadd codehole user1
 (integer) 1
 127.0.0.1:6379&gt; pfcount codehole
@@ -442,12 +296,7 @@ OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https:
 127.0.0.1:6379&gt; pfadd codehole user7 user8 user9 user10
 (integer) 1
 127.0.0.1:6379&gt; pfcount codehole
-(integer) 10  </code></pre><p><strong>pfmerge:</strong>在网站中我们有两个内容差不多的页面，运营说需要这两个页面的数据进行合并。其中页面的 UV 访问量也需要合并，那这个时候 pfmerge 就可以派上用场了。  </p>
-<p><strong>注意事项：</strong>hyperLogLog在计数很小的时候，采用稀疏矩阵存储，计数慢慢变大使得稀疏矩阵所用空间超过阈值时才会转变成稠密矩阵，才会占用12k空间。  </p>
-<hr>
-<h2 id="HyperLogLog-1"><a href="#HyperLogLog-1" class="headerlink" title="HyperLogLog:"></a>HyperLogLog:</h2><blockquote>
-<p>提供不精确的去重计数方案  </p>
-</blockquote>
+(integer) 10  </code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">**pfmerge:**在网站中我们有两个内容差不多的页面，运营说需要这两个页面的数据进行合并。其中页面的 UV 访问量也需要合并，那这个时候 pfmerge 就可以派上用场了。  </span><br><span class="line"></span><br><span class="line">**注意事项：**hyperLogLog在计数很小的时候，采用稀疏矩阵存储，计数慢慢变大使得稀疏矩阵所用空间超过阈值时才会转变成稠密矩阵，才会占用12k空间。  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">----------</span><br><span class="line">## HyperLogLog: ##</span><br><span class="line">&gt;提供不精确的去重计数方案</span><br></pre></td></tr></table></figure>
 <pre><code>127.0.0.1:6379&gt; pfadd codehole user1
 (integer) 1
 127.0.0.1:6379&gt; pfcount codehole
@@ -475,38 +324,12 @@ OK  </code></pre><p><strong>hash表-内部结构：</strong><br><img src="https:
 127.0.0.1:6379&gt; pfadd codehole user7 user8 user9 user10
 (integer) 1
 127.0.0.1:6379&gt; pfcount codehole
-(integer) 10</code></pre><p><strong>pfmerge:</strong>在网站中我们有两个内容差不多的页面，运营说需要这两个页面的数据进行合并。其中页面的 UV 访问量也需要合并，那这个时候 pfmerge 就可以派上用场了。  </p>
-<p><strong>注意事项</strong>：hyperLogLog在计数很小的时候，采用稀疏矩阵存储，计数慢慢变大使得稀疏矩阵所用空间超过阈值时才会转变成稠密矩阵，才会占用12k空间。  </p>
-<p><strong>HyperLogLog的概率学证明：</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701233939.png" alt=""><br>但是当统计数据量很小的时候误差较大，故采用调和平均数<br>调和平均数可以过滤掉异常离群点。<br>HyperLogLog原理：分了很多个桶，它的实现中，设有 16384 个桶，即：2^14 = 16384，每个桶有 6 位，每个桶可以表达的最大数字是：25+24+…+1 = 63 ，二进制为： 111 111 。 </p>
-<p>对于命令：pfadd key value<br>在存入时，value 会被 hash 成 64 位，即 64 bit 的比特字符串，前 14 位用来选择这个 value 的比特串中从右往左第一个 1 出现的下标位置数值要存到那个桶中去，即前 14 位用来分桶。设第一个1出现位置的数值为 index 。当 index=5 时，就是: ….10000 [01 0000 0000 0000]<br>之所以选 14位 来表达桶编号是因为，分了 16384 个桶，而 2^14 = 16384，刚好地，最大的时候可以把桶利用完，不造成浪费。假设一个字符串的前 14 位是：00 0000 0000 0010 (从右往左看) ，其十进制值为 2。那么 index 将会被转化后放到编号为 2 的桶。<br>index 的转化规则：<br>首先因为完整的 value 比特字符串是 64 位形式，减去 14 后，剩下 50 位，那么极端情况，出现 1 的位置，是在第 50 位，即位置是 50。此时 index = 50。此时先将 index 转为 2 进制，它是：110010 。<br>因为16384 个桶中，每个桶是 6 bit 组成的。刚好 110010 就被设置到了第 2 号桶中去了。请注意，50 已经是最坏的情况，且它都被容纳进去了。那么其他的不用想也肯定能被容纳进去。<br>因为 fpadd 的 key 可以设置多个 value。例如下面的例子：</p>
-<pre><code>pfadd lgh golang  
-pfadd lgh python  
-pfadd lgh java  </code></pre><p>根据上面的做法，不同的 value，会被设置到不同桶中去，如果出现了在同一个桶的，即前 14 位值是一样的，但是后面出现 1 的位置不一样。那么比较原来的 index 是否比新 index 大。是，则替换。否，则不变。<br>最终地，一个 key 所对应的 16384 个桶都设置了很多的 value 了，每个桶有一个k_max。此时调用 pfcount 时，按照前面介绍的估算方式，便可以计算出 key 的设置了多少次 value，也就是统计值。<br>value 被转为 64 位的比特串，最终被按照上面的做法记录到每个桶中去。64 位转为十进制就是：2^64，HyperLogLog 仅用了：16384 * 6 /8 / 1024 K （12k）存储空间就能统计多达 2^64 个数。  </p>
+(integer) 10</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">**pfmerge:**在网站中我们有两个内容差不多的页面，运营说需要这两个页面的数据进行合并。其中页面的 UV 访问量也需要合并，那这个时候 pfmerge 就可以派上用场了。  </span><br><span class="line"></span><br><span class="line">**注意事项**：hyperLogLog在计数很小的时候，采用稀疏矩阵存储，计数慢慢变大使得稀疏矩阵所用空间超过阈值时才会转变成稠密矩阵，才会占用12k空间。  </span><br><span class="line"></span><br><span class="line">**HyperLogLog的概率学证明：**  </span><br><span class="line">![](https:&#x2F;&#x2F;gitee.com&#x2F;guoer03&#x2F;picimg&#x2F;raw&#x2F;master&#x2F;20200701233939.png)  </span><br><span class="line">但是当统计数据量很小的时候误差较大，故采用调和平均数</span><br><span class="line">调和平均数可以过滤掉异常离群点。    </span><br><span class="line">HyperLogLog原理：分了很多个桶，它的实现中，设有 16384 个桶，即：2^14 &#x3D; 16384，每个桶有 6 位，每个桶可以表达的最大数字是：25+24+...+1 &#x3D; 63 ，二进制为： 111 111 。 </span><br><span class="line"> </span><br><span class="line">对于命令：pfadd key value  </span><br><span class="line">在存入时，value 会被 hash 成 64 位，即 64 bit 的比特字符串，前 14 位用来选择这个 value 的比特串中从右往左第一个 1 出现的下标位置数值要存到那个桶中去，即前 14 位用来分桶。设第一个1出现位置的数值为 index 。当 index&#x3D;5 时，就是: ....10000 [01 0000 0000 0000]</span><br><span class="line">之所以选 14位 来表达桶编号是因为，分了 16384 个桶，而 2^14 &#x3D; 16384，刚好地，最大的时候可以把桶利用完，不造成浪费。假设一个字符串的前 14 位是：00 0000 0000 0010 (从右往左看) ，其十进制值为 2。那么 index 将会被转化后放到编号为 2 的桶。  </span><br><span class="line">index 的转化规则：  </span><br><span class="line">首先因为完整的 value 比特字符串是 64 位形式，减去 14 后，剩下 50 位，那么极端情况，出现 1 的位置，是在第 50 位，即位置是 50。此时 index &#x3D; 50。此时先将 index 转为 2 进制，它是：110010 。  </span><br><span class="line">因为16384 个桶中，每个桶是 6 bit 组成的。刚好 110010 就被设置到了第 2 号桶中去了。请注意，50 已经是最坏的情况，且它都被容纳进去了。那么其他的不用想也肯定能被容纳进去。  </span><br><span class="line">因为 fpadd 的 key 可以设置多个 value。例如下面的例子：</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line">    pfadd lgh golang  </span><br><span class="line">    pfadd lgh python  </span><br><span class="line">    pfadd lgh java</span><br></pre></td></tr></table></figure>
+<p>根据上面的做法，不同的 value，会被设置到不同桶中去，如果出现了在同一个桶的，即前 14 位值是一样的，但是后面出现 1 的位置不一样。那么比较原来的 index 是否比新 index 大。是，则替换。否，则不变。<br>最终地，一个 key 所对应的 16384 个桶都设置了很多的 value 了，每个桶有一个k_max。此时调用 pfcount 时，按照前面介绍的估算方式，便可以计算出 key 的设置了多少次 value，也就是统计值。<br>value 被转为 64 位的比特串，最终被按照上面的做法记录到每个桶中去。64 位转为十进制就是：2^64，HyperLogLog 仅用了：16384 * 6 /8 / 1024 K （12k）存储空间就能统计多达 2^64 个数。  </p>
 <hr>
 <h2 id="布隆过滤器"><a href="#布隆过滤器" class="headerlink" title="布隆过滤器"></a>布隆过滤器</h2><p><strong>应用场景</strong>：用来判断某个value是否已经存在缓存当中，新闻推荐，不给用户推荐已经看过的新闻  </p>
-<pre><code>127.0.0.1:6379&gt; bf.add codehole user1
-(integer) 1
-127.0.0.1:6379&gt; bf.add codehole user2
-(integer) 1
-127.0.0.1:6379&gt; bf.add codehole user3
-(integer) 1
-127.0.0.1:6379&gt; bf.exists codehole user1
-(integer) 1
-127.0.0.1:6379&gt; bf.exists codehole user2
-(integer) 1
-127.0.0.1:6379&gt; bf.exists codehole user3
-(integer) 1
-127.0.0.1:6379&gt; bf.exists codehole user4
-(integer) 0
-127.0.0.1:6379&gt; bf.madd codehole user4 user5 user6
-1) (integer) 1
-2) (integer) 1
-3) (integer) 1
-127.0.0.1:6379&gt; bf.mexists codehole user4 user5 user6 user7
-1) (integer) 1
-2) (integer) 1
-3) (integer) 1
-4) (integer) 0</code></pre><p>对于见过的元素肯定不会误判，对于没见过的元素，有可能会认为已经存在了<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234300.png" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234312.png" alt="">  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; bf.add codehole user1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.add codehole user2</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.add codehole user3</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.exists codehole user1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.exists codehole user2</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.exists codehole user3</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.exists codehole user4</span><br><span class="line">(integer) 0</span><br><span class="line">127.0.0.1:6379&gt; bf.madd codehole user4 user5 user6</span><br><span class="line">1) (integer) 1</span><br><span class="line">2) (integer) 1</span><br><span class="line">3) (integer) 1</span><br><span class="line">127.0.0.1:6379&gt; bf.mexists codehole user4 user5 user6 user7</span><br><span class="line">1) (integer) 1</span><br><span class="line">2) (integer) 1</span><br><span class="line">3) (integer) 1</span><br><span class="line">4) (integer) 0</span><br></pre></td></tr></table></figure>
+<p>对于见过的元素肯定不会误判，对于没见过的元素，有可能会认为已经存在了<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234300.png" alt=""><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234312.png" alt="">  </p>
 <p>随着元素存储越来越多，那么都会变成1，最后再来啥元素都会判定已经存在了。</p>
 <p><strong>如何选择哈希函数个数和布隆过滤器长度</strong><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701234345.png" alt=""><br>k 为哈希函数个数，m 为布隆过滤器长度，n 为插入的元素个数，p 为误报率。</p>
 <hr>
@@ -534,32 +357,11 @@ pfadd lgh java  </code></pre><p>根据上面的做法，不同的 value，会被
 <p>为了提高缓存命中率，需要保证缓存数据都是热点数据，可以将内存最大使用量设置为热点数据占用的内存量，然后启用allkeys-lru淘汰策略，将最近最少使用的数据淘汰。</p>
 <hr>
 <h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p><strong>基本使用：</strong></p>
-<pre><code>&gt; multi
-OK
-&gt; incr books
-QUEUED #表示指令已经被服务器缓存到队列里了
-&gt; incr books
-QUEUED
-&gt; exec
-(integer) 1
-(integer) 2</code></pre><p>所有的指令在exec之前不执行，而是缓存在服务器的一个事务队列中，服务器一旦收到exec指令，才开始执行整个事务队列，执行完毕一次性返回所有指令的运行结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt; multi</span><br><span class="line">OK</span><br><span class="line">&gt; incr books</span><br><span class="line">QUEUED #表示指令已经被服务器缓存到队列里了</span><br><span class="line">&gt; incr books</span><br><span class="line">QUEUED</span><br><span class="line">&gt; exec</span><br><span class="line">(integer) 1</span><br><span class="line">(integer) 2</span><br></pre></td></tr></table></figure>
+<p>所有的指令在exec之前不执行，而是缓存在服务器的一个事务队列中，服务器一旦收到exec指令，才开始执行整个事务队列，执行完毕一次性返回所有指令的运行结果。</p>
 <p>Redis事务不支持原子性只是保证了事务的隔离性：实验如下  </p>
-<pre><code>127.0.0.1:6379&gt; multi
-OK
-127.0.0.1:6379&gt; set books iamastring
-QUEUED
-127.0.0.1:6379&gt; incr books
-QUEUED
-127.0.0.1:6379&gt; set poorman iamdesperate
-QUEUED
-127.0.0.1:6379&gt; exec
-1) OK
-2) (error) ERR value is not an integer or out of range
-3) OK
-127.0.0.1:6379&gt; get poorman
-&quot;iamdesperate&quot;
-127.0.0.1:6379&gt; get books
-&quot;iamastring&quot;</code></pre><hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; multi</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set books iamastring</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; incr books</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; set poorman iamdesperate</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; exec</span><br><span class="line">1) OK</span><br><span class="line">2) (error) ERR value is not an integer or out of range</span><br><span class="line">3) OK</span><br><span class="line">127.0.0.1:6379&gt; get poorman</span><br><span class="line">&quot;iamdesperate&quot;</span><br><span class="line">127.0.0.1:6379&gt; get books</span><br><span class="line">&quot;iamastring&quot;</span><br></pre></td></tr></table></figure>
+<hr>
 <h2 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h2><blockquote>
 <p>Redis服务器是一个事件驱动程序。   </p>
 </blockquote>
@@ -567,22 +369,8 @@ QUEUED
 <p>Redis <strong>基于 Reactor 模式</strong>开发了自己的网络事件处理器，使用 I/O 多路复用程序来同时监听多个套接字，并将到达的<br>事件传送给文件事件分派器，分派器会根据套接字产生的事件类型调用相应的事件处理器。<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235037.png" alt="">  </p>
 <p><strong>时间事件</strong><br>服务器有一些操作需要在给定的时间点执行，时间事件是对这类定时操作的抽象  </p>
 <p><strong>定时事件</strong>：让一段程序在指定的时间内执行一次<br><strong>周期性事件</strong>：每隔指定时间就执行一次<br>Redis将所有的时间事件都放在一个无序链表中，通过遍历整个链表查找出已到达的时间事件，并调用相应的事件处理器。<br><strong>事件的调度与执行</strong><br>服务器需要不断监听文件事件的套接字才能得到待处理的文件事件，但是不能一直监听，否则时间事件无法在规定的时间内执行，因此监听时间应该根据距离现在最近的时间事件来决定。 </p>
-<pre><code>def aeProcessEvents():
-# 获取到达时间离当前时间最接近的时间事件
-time_event = aeSearchNearestTimer()
-# 计算最接近的时间事件距离到达还有多少毫秒
-remaind_ms = time_event.when - unix_ts_now()
-# 如果事件已到达，那么 remaind_ms 的值可能为负数，将它设为 0
-if remaind_ms &lt; 0:
-remaind_ms = 0
-# 根据 remaind_ms 的值，创建 timeval
-timeval = create_timeval_with_ms(remaind_ms)
-# 阻塞并等待文件事件产生，最大阻塞时间由传入的 timeval 决定
-aeApiPoll(timeval)
-# 处理所有已产生的文件事件
-procesFileEvents()
-# 处理所有已到达的时间事件
-processTimeEvents()</code></pre><p>从事件处理的角度看服务器的执行流程：<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235135.png" alt="">  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aeProcessEvents</span><span class="params">()</span>:</span></span><br><span class="line"> <span class="comment"># 获取到达时间离当前时间最接近的时间事件</span></span><br><span class="line"> time_event = aeSearchNearestTimer()</span><br><span class="line"> <span class="comment"># 计算最接近的时间事件距离到达还有多少毫秒</span></span><br><span class="line"> remaind_ms = time_event.when - unix_ts_now()</span><br><span class="line"> <span class="comment"># 如果事件已到达，那么 remaind_ms 的值可能为负数，将它设为 0</span></span><br><span class="line"> <span class="keyword">if</span> remaind_ms &lt; <span class="number">0</span>:</span><br><span class="line"> remaind_ms = <span class="number">0</span></span><br><span class="line"> <span class="comment"># 根据 remaind_ms 的值，创建 timeval</span></span><br><span class="line"> timeval = create_timeval_with_ms(remaind_ms)</span><br><span class="line"> <span class="comment"># 阻塞并等待文件事件产生，最大阻塞时间由传入的 timeval 决定</span></span><br><span class="line"> aeApiPoll(timeval)</span><br><span class="line"> <span class="comment"># 处理所有已产生的文件事件</span></span><br><span class="line"> procesFileEvents()</span><br><span class="line"> <span class="comment"># 处理所有已到达的时间事件</span></span><br><span class="line"> processTimeEvents()</span><br></pre></td></tr></table></figure>
+<p>从事件处理的角度看服务器的执行流程：<br><img src="https://gitee.com/guoer03/picimg/raw/master/20200701235135.png" alt="">  </p>
 <hr>
 <h2 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h2><p>使用slaveof host port命令来让一个服务器成为另一个服务器的从服务器<br>**<br>支持主从复制和从从复制**</p>
 <p><strong>CAP原理：</strong>网络分区发生时，一致性和可用性两难全  </p>
