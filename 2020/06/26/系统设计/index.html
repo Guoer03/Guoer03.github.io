@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="java">
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>
+    系统设计 | Guoer03的学习笔记
+  </title>
+  <meta name="description" content="java后端，人工智能">
+  
+  <meta name="keywords" content="
+  系统设计,java相关
+  ">
+  
+  <meta name="author" content="Arthur Ming">
+
+  <meta http-equiv="Cache-Control" content="no-transform"/>
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="theme-color" content="#1e2327">
+  <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+  <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+
+  
+<script>
+  var _hmt = _hmt || [];
+  (function(){var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?619384c7a8842a5937347674d96c7276";
+    var s = document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm, s);})();
+</script>
+
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa fa-github"></i></a>
+
+      <div class="navbar-search float-left desktop-only">
+        <div class="navbar-search-form">
+          <label for="gsc-i-id1">This website</label>
+          <div id="google-search">
+            <gcse:search></gcse:search>
+          </div>
+        </div>
+      </div>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">Archives</a></li>
+        
+        
+        <li><a href="/categories">Categories</a></li>
+        
+        
+        <li><a href="/tags">Tags</a></li>
+        
+        
+        <li class="desktop-only"><a href="/atom.xml" target="_blank">RSS</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="/images/header.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> Posts </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 6 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> Tags </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> Categories </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 0 </a>
+      </li>
+    </ul>
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">Guoer03的学习笔记</a>
+      
+      
+    </h2>
+  </div>
+
+  <div class="container">
+    <div class="header-tab-wrapper clearfix">
+      <span class="header-tab header-tab-selected"><i class="fa fa-thumbs-o-up"></i> Like</span>
+      <span class="header-tab"><i class="fa fa-share-alt"></i> Share</span>
+      <span class="header-tab"><i class="fa fa-comments-o"></i> Discussion</span>
+      <span class="header-tab"><i class="fa fa-bookmark-o"></i> Bookmark </span>
+      <span class="header-tab"><i class="fa fa-smile-o"></i> Smile <i class="fa fa-caret-down"></i></span>
+    </div>
+  </div>
+</header>
+
+
+<div class="post-container container">
+  <h3>
+    <i class="fa fa-user-o"></i>
+    Arthur Ming
+
+    <span class="post-date float-right" title="{{moment(1593168639000).format('MMM DD, YYYY, h:mm:ss A')}}">
+      
+          <i class="fa fa-pencil-square-o"></i>
+      
+      {{moment(1593168639000).fromNow()}}
+    </span>
+  </h3>
+
+  <article class="post-content">
+    <h1>系统设计</h1>
+    <br>  
+
+<h1 id="系统设计基础"><a href="#系统设计基础" class="headerlink" title="系统设计基础"></a>系统设计基础</h1><h2 id="一-性能"><a href="#一-性能" class="headerlink" title="一.性能"></a>一.性能</h2><h3 id="性能指标"><a href="#性能指标" class="headerlink" title="性能指标"></a>性能指标</h3><p><strong>1. 响应时间</strong><br>指某个请求从发出到接收到响应消耗的时间。<br>在对响应时间进行测试时，通常采用重复请求的方式，然后计算平均响应时间。  </p>
+<p><strong>2. 吞吐量</strong><br>指系统在单位时间内可以处理的请求数量，通常使用每秒的请求数来衡量。  </p>
+<p><strong>3. 并发用户数</strong><br>指系统能同时处理的并发用户请求数量。  </p>
+<h3 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h3><ol>
+<li><p><strong>集群</strong><br>将多台服务器组成集群，使用负载均衡将请求转发到集群中，避免单一服务器的负载压力过大导致性能降低。  </p>
+</li>
+<li><p><strong>缓存</strong><br>缓存能够提高性能的原因如下：  </p>
+<ul>
+<li>缓存数据通常位于内存等介质中，这种介质对于读操作特别快；</li>
+<li>缓存数据可以位于靠近用户的地理位置上；  </li>
+<li>可以将计算结果进行缓存，从而避免重复计算。   </li>
+</ul>
+</li>
+<li><p><strong>异步</strong><br>某些流程可以将操作转换为消息，将消息发送到消息队列之后立即返回，之后这个操作会被异步处理。  </p>
+</li>
+</ol>
+<h2 id="二、伸缩性"><a href="#二、伸缩性" class="headerlink" title="二、伸缩性"></a>二、伸缩性</h2><blockquote>
+<p>指不断向集群中添加服务器来缓解不断上升的用户并发访问压力和不断增长的数据存储需求  </p>
+</blockquote>
+<h3 id="伸缩性与性能"><a href="#伸缩性与性能" class="headerlink" title="伸缩性与性能"></a>伸缩性与性能</h3><p>如果系统存在性能问题，那么单个用户的请求总是很慢的；<br>如果系统存在伸缩性问题，那么单个用户的请求可能会很快，但是在并发数很高的情况下系统会很慢。</p>
+<h3 id="实现伸缩性"><a href="#实现伸缩性" class="headerlink" title="实现伸缩性"></a>实现伸缩性</h3><p>应用服务器只要不具有状态，那么就可以很容易地通过负载均衡器向集群中添加新的服务器。<br>关系型数据库的伸缩性通过 Sharding 来实现，将数据按一定的规则分布到不同的节点上，从而解决单台存储服务器的存储空间限制。<br>对于非关系型数据库，它们天生就是为海量数据而诞生，对伸缩性的支持特别好。   </p>
+<h2 id="三、扩展性"><a href="#三、扩展性" class="headerlink" title="三、扩展性"></a>三、扩展性</h2><blockquote>
+<p>指的是添加新功能时对现有系统的其它应用无影响，这就要求不同应用具备低耦合的特点。  </p>
+</blockquote>
+<p>实现可扩展主要有两种方式：</p>
+<ul>
+<li>使用消息队列进行解耦，应用之间通过消息传递进行通信；</li>
+<li>使用分布式服务将业务和可复用的服务分离开来，业务使用分布式服务框架调用可复用的服务。新增的产品可以通过调用可复用的服务来实现业务逻辑，对其它产品没有影响。  </li>
+</ul>
+<h2 id="四、可用性"><a href="#四、可用性" class="headerlink" title="四、可用性"></a>四、可用性</h2><h3 id="冗余"><a href="#冗余" class="headerlink" title="冗余"></a>冗余</h3><p>保证高可用的主要手段是使用冗余，当某个服务器故障时就请求其它服务器。<br>应用服务器的冗余比较容易实现，只要保证应用服务器不具有状态，那么某个应用服务器故障时，负载均衡器将该应用服务器原先的用户请求转发到另一个应用服务器上，不会对用户有任何影响。<br>存储服务器的冗余需要使用主从复制来实现，当主服务器故障时，需要提升从服务器为主服务器，这个过程称为切换。  </p>
+<h3 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h3><p>对 CPU、内存、磁盘、网络等系统负载信息进行监控，当某个信息达到一定阈值时通知运维人员，从而在系统发生<br>故障之前及时发现问题。  </p>
+<h3 id="服务降级"><a href="#服务降级" class="headerlink" title="服务降级"></a>服务降级</h3><p>服务降级是系统为了应对大量的请求，主动关闭部分功能，从而保证核心功能可用  </p>
+<h2 id="五、安全性"><a href="#五、安全性" class="headerlink" title="五、安全性"></a>五、安全性</h2><blockquote>
+<p>要求系统在应对各种攻击手段时能够有可靠的应对措施</p>
+</blockquote>
+<br>
+# 分布式 #
+## 一、分布式锁 ##
+>阻塞锁通常使用互斥量来实现：
+互斥量为 0 表示有其它进程在使用锁，此时处于锁定状态；
+互斥量为 1 表示未锁定状态。
+### 数据库的唯一索引 ###
+>获得锁时向表中插入一条记录，释放锁时删除这条记录。唯一索引可以保证该记录只被插入一次，那么就可以用这个
+记录是否存在来判断是否存于锁定状态。  
+
+<p>存在以下几个问题：  </p>
+<ul>
+<li>锁没有失效时间，解锁失败的话其它进程无法再获得该锁。  </li>
+<li>只能是非阻塞锁，插入失败直接就报错了，无法重试。 </li>
+<li>不可重入，已经获得锁的进程也必须重新获取锁。</li>
+</ul>
+<h3 id="Redis-的-SETNX-指令"><a href="#Redis-的-SETNX-指令" class="headerlink" title="Redis 的 SETNX 指令"></a>Redis 的 SETNX 指令</h3><blockquote>
+<p>使用 SETNX（set if not exist）指令插入一个键值对，如果 Key 已经存在，那么会返回 False，否则插入成功并返回<br>True。</p>
+</blockquote>
+<p>SETNX 指令和数据库的唯一索引类似，保证了只存在一个 Key 的键值对，那么可以用一个 Key 的键值对是否存在来<br>判断是否存于锁定状态。  </p>
+<p>EXPIRE 指令可以为一个键值对设置一个过期时间，从而避免了数据库唯一索引实现方式中释放锁失败的问题。  </p>
+<h3 id="Redis-的-RedLock-算法"><a href="#Redis-的-RedLock-算法" class="headerlink" title="Redis 的 RedLock 算法"></a>Redis 的 RedLock 算法</h3><blockquote>
+<p>使用了多个 Redis 实例来实现分布式锁，这是为了保证在发生单点故障时仍然可用。</p>
+</blockquote>
+<ul>
+<li>尝试从 N 个互相独立 Redis 实例获取锁；</li>
+<li>计算获取锁消耗的时间，只有当这个时间小于锁的过期时间，并且从大多数（N / 2 + 1）实例上获取了锁，那么就认为锁获取成功了；</li>
+<li>如果锁获取失败，就到每个实例上释放锁。  </li>
+</ul>
+<h3 id="Zookeeper-的有序节点"><a href="#Zookeeper-的有序节点" class="headerlink" title="Zookeeper 的有序节点"></a>Zookeeper 的有序节点</h3><p><strong>1. Zookeeper 抽象模型</strong><br>Zookeeper 提供了一种树形结构的命名空间，/app1/p_1 节点的父节点为 /app1。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593864833(1).png" alt="">  </p>
+<p><strong>2. 节点类型</strong>  </p>
+<ul>
+<li>永久节点：不会因为会话结束或者超时而消失；</li>
+<li>临时节点：如果会话结束或者超时就会消失；</li>
+<li>有序节点：会在节点名的后面加一个数字后缀，并且是有序的，例如生成的有序节点为 /lock/node-</li>
+<li>0000000000，它的下一个有序节点则为 /lock/node-0000000001，以此类推。  </li>
+</ul>
+<p><strong>3. 监听器</strong>  </p>
+<blockquote>
+<p>为一个节点注册监听器，在节点状态发生改变时，会给客户端发送消息。  </p>
+</blockquote>
+<p><strong>4. 分布式锁实现</strong>  </p>
+<ul>
+<li>创建一个锁目录 /lock；</li>
+<li>当一个客户端需要获取锁时，在 /lock 下创建临时的且有序的子节点；</li>
+<li>客户端获取 /lock 下的子节点列表，判断自己创建的子节点是否为当前子节点列表中序号最小的子节点，如果是</li>
+<li>则认为获得锁；否则监听自己的前一个子节点，获得子节点的变更通知后重复此步骤直至获得锁；</li>
+<li>执行业务代码，完成后，删除对应的子节点。</li>
+</ul>
+<p><strong>5. 会话超时</strong><br>如果一个已经获得锁的会话超时了，因为创建的是临时节点，所以该会话对应的临时节点会被删除，其它会话就可以<br>获得锁了。可以看到，Zookeeper 分布式锁不会出现数据库的唯一索引实现的分布式锁释放锁失败问题。</p>
+
+  </article>
+</div>
+
+
+    
+
+
+
+
+</div>
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+    <a href="http://guoer03.xyz" class="footer-logo">
+      <i class="fa fa-github"></i>
+    </a>
+    <ul class="footer-social-link">
+      <li>© 2020 Arthur Ming</li>
+      <li><a href="http://guoer03.xyz">Home</a></li>
+      
+    </ul>
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+    <span id="busuanzi_container_site_pv">总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+    <span class="post-meta-divider">|</span>
+    <div class="footer-theme-info">
+      MingHai ❤ Love My girl gl
+    </div>
+    </div>
+    
+  </footer>
+</div>
+
+
+
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>
