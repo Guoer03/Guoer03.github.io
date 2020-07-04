@@ -233,7 +233,57 @@
 <li>则认为获得锁；否则监听自己的前一个子节点，获得子节点的变更通知后重复此步骤直至获得锁；</li>
 <li>执行业务代码，完成后，删除对应的子节点。</li>
 </ul>
-<p><strong>5. 会话超时</strong><br>如果一个已经获得锁的会话超时了，因为创建的是临时节点，所以该会话对应的临时节点会被删除，其它会话就可以<br>获得锁了。可以看到，Zookeeper 分布式锁不会出现数据库的唯一索引实现的分布式锁释放锁失败问题。</p>
+<p><strong>5. 会话超时</strong><br>如果一个已经获得锁的会话超时了，因为创建的是临时节点，所以该会话对应的临时节点会被删除，其它会话就可以<br>获得锁了。可以看到，Zookeeper 分布式锁不会出现数据库的唯一索引实现的分布式锁释放锁失败问题。<br><strong>6. 羊群效应</strong><br>一个节点未获得锁，只需要监听自己的前一个子节点，这是因为如果监听所有的子节点，那么任意一个子节点状态改<br>变，其它所有子节点都会收到通知（羊群效应），而我们只希望它的后一个子节点收到通知。  </p>
+<h2 id="二、分布式事务"><a href="#二、分布式事务" class="headerlink" title="二、分布式事务"></a>二、分布式事务</h2><blockquote>
+<p>指事务的操作位于不同的节点上，需要保证事务的 ACID 特性。</p>
+</blockquote>
+<h3 id="2PC"><a href="#2PC" class="headerlink" title="2PC"></a>2PC</h3><p>两阶段提交（Two-phase Commit，2PC），通过引入协调者（Coordinator）来协调参与者的行为，并最终决定这<br>些参与者是否要真正执行事务。</p>
+<p><strong>1. 运行过程</strong><br>1.1 准备阶段  </p>
+<blockquote>
+<p>协调者询问参与者事务是否执行成功，参与者发回事务执行结果。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593869060(1).png" alt=""></p>
+</blockquote>
+<p>1.2 提交阶段<br>如果事务在每个参与者上都执行成功，事务协调者发送通知让参与者提交事务；否则，协调者发送通知让参与者回滚<br>事务。<br>需要注意的是，在准备阶段，参与者执行了事务，但是还未提交。只有在提交阶段接收到协调者发来的通知后，才进<br>行提交或者回滚<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593869119(1).png" alt="">  </p>
+<p><strong>2. 存在的问题</strong><br><strong>2.1 同步阻塞</strong><br>所有事务参与者在等待其它参与者响应的时候都处于同步阻塞状态，无法进行其它操作。<br><strong>2.2 单点问题</strong><br>协调者在 2PC 中起到非常大的作用，发生故障将会造成很大影响。特别是在阶段二发生故障，所有参与者会一直等<br>待，无法完成其它操作。<br><strong>2.3 数据不一致</strong><br>在阶段二，如果协调者只发送了部分 Commit 消息，此时网络发生异常，那么只有部分参与者接收到 Commit 消<br>息，也就是说只有部分参与者提交了事务，使得系统数据不一致。<br><strong>2.4 太过保守</strong><br>任意一个节点失败就会导致整个事务失败，没有完善的容错机制。  </p>
+<h3 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h3><p>本地消息表与业务数据表处于同一个数据库中，这样就能利用本地事务来保证在对这两个表的操作满足事务特性，并且使用了消息队列来保证最终一致性。  </p>
+<ol>
+<li>在分布式事务操作的一方完成写业务数据的操作之后向本地消息表发送一个消息，本地事务能保证这个消息一<br>定会被写入本地消息表中。  </li>
+<li>之后将本地消息表中的消息转发到消息队列中，如果转发成功则将消息从本地消息表中删除，否则继续重新转<br>发。  </li>
+<li>在分布式事务操作的另一方从消息队列中读取一个消息，并执行消息中的操作。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593869231(1).png" alt="">  </li>
+</ol>
+<h2 id="三、CAP"><a href="#三、CAP" class="headerlink" title="三、CAP"></a>三、CAP</h2><p>分布式系统不可能同时满足一致性（C：Consistency）、可用性（A：Availability）和分区容忍性（P：Partition<br>Tolerance），最多只能同时满足其中两项。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593869277(1).png" alt="">  </p>
+<h3 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h3><blockquote>
+<p>一致性指的是多个数据副本是否能保持一致的特性，在一致性的条件下，系统在执行数据更新操作之后能够从一致性<br>状态转移到另一个一致性状态。</p>
+</blockquote>
+<p>对系统的一个数据更新成功之后，如果所有用户都能够读取到最新的值，该系统就被认为具有强一致性。</p>
+<h3 id="可用性"><a href="#可用性" class="headerlink" title="可用性"></a>可用性</h3><blockquote>
+<p>可用性指分布式系统在面对各种异常时可以提供正常服务的能力，可以用系统可用时间占总时间的比值来衡量，4 个<br>9 的可用性表示系统 99.99% 的时间是可用的。</p>
+</blockquote>
+<p>在可用性条件下，要求系统提供的服务一直处于可用的状态，对于用户的每一个操作请求总是能够在有限的时间内返<br>回结果。  </p>
+<h3 id="分区容忍性"><a href="#分区容忍性" class="headerlink" title="分区容忍性"></a>分区容忍性</h3><blockquote>
+<p>网络分区指分布式系统中的节点被划分为多个区域，每个区域内部可以通信，但是区域之间无法通信。</p>
+</blockquote>
+<p>在分区容忍性条件下，分布式系统在遇到任何网络分区故障的时候，仍然需要能对外提供一致性和可用性的服务，除<br>非是整个网络环境都发生了故障。  </p>
+<h3 id="权衡"><a href="#权衡" class="headerlink" title="权衡"></a>权衡</h3><p>在分布式系统中，分区容忍性必不可少，因为需要总是假设网络是不可靠的。因此，CAP 理论实际上是要在可用性和一致性之间做权衡。 </p>
+<p>可用性和一致性往往是冲突的，很难使它们同时满足。在多个节点之间进行数据同步时，  </p>
+<ul>
+<li>为了保证一致性（CP），不能访问未同步完成的节点，也就失去了部分可用性；  </li>
+<li>为了保证可用性（AP），允许读取所有节点的数据，但是数据可能不一致。  </li>
+</ul>
+<h2 id="四、BASE"><a href="#四、BASE" class="headerlink" title="四、BASE"></a>四、BASE</h2><p>BASE 是<strong>基本可用</strong>（Basically Available）、<strong>软状态</strong>（Soft State）和<strong>最终一致性</strong>（Eventually Consistent）三个短语的缩写。  </p>
+<p>BASE 理论是对 CAP 中一致性和可用性权衡的结果，它的核心思想是：即使无法做到强一致性，但每个应用都可以根据自身业务特点，采用适当的方式来使系统达到最终一致性。  </p>
+<h3 id="基本可用"><a href="#基本可用" class="headerlink" title="基本可用"></a>基本可用</h3><p>指<strong>分布式系统在出现故障的时候，保证核心可用，允许损失部分可用性。</strong><br>例如，电商在做促销时，为了保证购物系统的稳定性，部分消费者可能会被引导到一个降级的页面。</p>
+<h3 id="软状态"><a href="#软状态" class="headerlink" title="软状态"></a>软状态</h3><p>指允许系统中的数据存在中间状态，并认为该中间状态不会影响系统整体可用性，即<strong>允许系统不同节点的数据副本之<br>间进行同步的过程存在时延。</strong></p>
+<h3 id="最终一致性"><a href="#最终一致性" class="headerlink" title="最终一致性"></a>最终一致性</h3><p><strong>最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能达到一致的状态。</strong><br>ACID 要求强一致性，通常运用在传统的数据库系统上。而 BASE 要求最终一致性，通过牺牲强一致性来达到可用<br>性，通常运用在大型分布式系统中。<br>在实际的分布式场景中，不同业务单元和组件对一致性的要求是不同的，因此 ACID 和 BASE 往往会结合在一起使<br>用。  </p>
+<h2 id="五、Paxos"><a href="#五、Paxos" class="headerlink" title="五、Paxos"></a>五、Paxos</h2><blockquote>
+<p>自Paxos问世以来就持续垄断了分布式一致性算法，Paxos这个名词几乎等同于分布式一致性。  </p>
+</blockquote>
+<p>用于达成共识性问题，即对多个节点产生的值，该算法能保证只选出唯一一个值。<br>主要有三类节点：</p>
+<ul>
+<li><strong>提议者（Proposer）</strong>：提出提案 (Proposal)。Proposal信息包括提案编号 (Proposal ID) 和提议的值 (Value)。</li>
+<li><strong>接受者（Acceptor）</strong>：参与决策，回应Proposers的提案。收到Proposal后可以接受提案，若Proposal获得多数Acceptors的接受，则称该Proposal被批准。</li>
+<li><strong>告知者（Learner）</strong>：不参与决策，从Proposers/Acceptors学习最新达成一致的提案（Value）。</li>
+</ul>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593869573(1).png" alt=""><br>具体过程解释看这篇：<a href="https://www.zhihu.com/question/19787937" target="_blank" rel="noopener" title="Paxos算法通俗解释">https://www.zhihu.com/question/19787937</a></p>
 
   </article>
 </div>
