@@ -13,7 +13,7 @@
   <meta name="description" content="java后端，人工智能">
   
   <meta name="keywords" content="
-  java相关,系统设计
+  java相关,系统设计,分布式
   ">
   
   <meta name="author" content="Arthur Ming">
@@ -103,7 +103,7 @@
         <a href="/tags" class="header-toolbar-left"><i
                   class="fa fa-tags"></i> Tags </a>
         <a href="/tags"
-           class="header-toolbar-right"> 9 </a>
+           class="header-toolbar-right"> 10 </a>
       </li>
       <li>
         <a href="/categories" class="header-toolbar-left"><i
@@ -283,8 +283,120 @@
 <li><strong>接受者（Acceptor）</strong>：参与决策，回应Proposers的提案。收到Proposal后可以接受提案，若Proposal获得多数Acceptors的接受，则称该Proposal被批准。</li>
 <li><strong>告知者（Learner）</strong>：不参与决策，从Proposers/Acceptors学习最新达成一致的提案（Value）。</li>
 </ul>
-<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593869573(1).png" alt=""><br>具体过程解释看这篇：<a href="https://www.zhihu.com/question/19787937" target="_blank" rel="noopener" title="Paxos算法通俗解释">https://www.zhihu.com/question/19787937</a></p>
-
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593869573(1).png" alt=""></p>
+<h3 id="执行过程"><a href="#执行过程" class="headerlink" title="执行过程"></a>执行过程</h3><p>规定一个提议包含两个字段：[n, v]，其中 n 为序号（具有唯一性），v 为提议值。<br><strong>1. Prepare 阶段</strong>  </p>
+<p>下图演示了两个 Proposer 和三个 Acceptor 的系统中运行该算法的初始过程，每个 Proposer 都会向所有 Acceptor<br>发送 Prepare 请求。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593875281(1).png" alt=""><br>当 Acceptor 接收到一个 Prepare 请求，包含的提议为 [n1, v1]，并且之前还未接收过 Prepare 请求，那么发送一个Prepare 响应，设置当前接收到的提议为 [n1, v1]，并且保证以后不会再接受序号小于 n1 的提议。  </p>
+<p>如下图，Acceptor X 在收到 [n=2, v=8] 的 Prepare 请求时，由于之前没有接收过提议，因此就发送一个 [noprevious] 的 Prepare 响应，设置当前接收到的提议为 [n=2, v=8]，并且保证以后不会再接受序号小于 2 的提议。其它的 Acceptor 类似。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593875355(1).png" alt=""><br>如果 Acceptor 接收到一个 Prepare 请求，包含的提议为 [n2, v2]，并且之前已经接收过提议 [n1, v1]。如果 n1 &gt;n2，那么就丢弃该提议请求；否则，发送 Prepare 响应，该 Prepare 响应包含之前已经接收过的提议 [n1, v1]，设置当前接收到的提议为 [n2, v2]，并且保证以后不会再接受序号小于 n2 的提议。  </p>
+<p>如下图，Acceptor Z 收到 Proposer A 发来的 [n=2, v=8] 的 Prepare 请求，由于之前已经接收过 [n=4, v=5] 的提<br>议，并且 n &gt; 2，因此就抛弃该提议请求；Acceptor X 收到 Proposer B 发来的 [n=4, v=5] 的 Prepare 请求，因为之<br>前接收到的提议为 [n=2, v=8]，并且 2 &lt;= 4，因此就发送 [n=2, v=8] 的 Prepare 响应，设置当前接收到的提议为<br>[n=4, v=5]，并且保证以后不会再接受序号小于 4 的提议。Acceptor Y 类似。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593878822(1).png" alt="">  </p>
+<p><strong>2. Accept 阶段</strong>  </p>
+<p>当一个 Proposer 接收到超过一半 Acceptor 的 Prepare 响应时，就可以发送 Accept 请求。</p>
+<p>Proposer A 接收到两个 Prepare 响应之后，就发送 [n=2, v=8] Accept 请求。该 Accept 请求会被所有 Acceptor 丢弃，因为此时所有 Acceptor 都保证不接受序号小于 4 的提议。</p>
+<p>Proposer B 过后也收到了两个 Prepare 响应，因此也开始发送 Accept 请求。需要注意的是，Accept 请求的 v 需要<br>取它收到的最大提议编号对应的 v 值，也就是 8。因此它发送 [n=4, v=8] 的 Accept 请求。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593878822(1).png" alt="">  </p>
+<p><strong>3. Learn 阶段</strong></p>
+<p>Acceptor 接收到 Accept 请求时，如果序号大于等于该 Acceptor 承诺的最小序号，那么就发送 Learn 提议给所有的Learner。当 Learner 发现有大多数的 Acceptor 接收了某个提议，那么该提议的提议值就被 Paxos 选择出来。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593925534(1).png" alt="">  </p>
+<h3 id="约束条件"><a href="#约束条件" class="headerlink" title="约束条件"></a>约束条件</h3><p><strong>1. 正确性</strong></p>
+<p>指只有一个提议值会生效。  </p>
+<p>因为 Paxos 协议要求每个生效的提议被多数 Acceptor 接收，并且 Acceptor 不会接受两个不同的提议，因此可以保<br>证正确性。  </p>
+<p><strong>2. 可终止性</strong></p>
+<p>指最后总会有一个提议生效。</p>
+<p>Paxos 协议能够让 Proposer 发送的提议朝着能被大多数 Acceptor 接受的那个提议靠拢，因此能够保证可终止性。</p>
+<blockquote>
+<p>谈谈自己的理解：在一堆服务器中，有一些服务器可能会宕机，那么在其他服务器都更新了很多次值以后，某个服务器它的值还停留在最初始的地方。那么这个proposer发出自己提议的时候，就不能因为它是最新的提议就直接同步所有的值与之相等，就需要用到paxos算法来投票了。</p>
+</blockquote>
+<blockquote>
+<p>具体的每一个阶段的必要性证明：<a href="https://zhuanlan.zhihu.com/p/27829918?utm_source=wechat_session&utm_medium=social&utm_oi=870099841890521088" target="_blank" rel="noopener" title="paxos的必要性证明">https://zhuanlan.zhihu.com/p/27829918?utm_source=wechat_session&amp;utm_medium=social&amp;utm_oi=870099841890521088</a>  </p>
+</blockquote>
+<h2 id="六、Raft"><a href="#六、Raft" class="headerlink" title="六、Raft"></a>六、Raft</h2><blockquote>
+<p>Raft 也是分布式一致性协议，主要是用来竞选主节点。</p>
+</blockquote>
+<h2 id="单个-Candidate-的竞选"><a href="#单个-Candidate-的竞选" class="headerlink" title="单个 Candidate 的竞选"></a>单个 Candidate 的竞选</h2><p>有三种节点：Follower、Candidate 和 Leader。Leader 会周期性的发送心跳包给 Follower。每个 Follower 都设置<br>了一个随机的竞选超时时间，一般为 150ms~300ms，如果在这个时间内没有收到 Leader 的心跳包，就会变成<br>Candidate，进入竞选阶段。  </p>
+<ul>
+<li>下图展示一个分布式系统的最初阶段，此时只有 Follower 没有 Leader。Node A 等待一个随机的竞选超时时间之后，没收到 Leader 发来的心跳包，因此进入竞选阶段。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593935770(1).png" alt=""> </li>
+</ul>
+<ul>
+<li><p>此时 Node A 发送投票请求给其它所有节点。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593935840(1).png" alt="">  </p>
+</li>
+<li><p>其它节点会对请求进行回复，如果超过一半的节点回复了，那么该 Candidate 就会变成 Leader。  </p>
+</li>
+</ul>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593935884(1).png" alt="">  </p>
+<ul>
+<li>之后 Leader 会周期性地发送心跳包给 Follower，Follower 接收到心跳包，会重新开始计时。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593935938(1).png" alt="">  </li>
+</ul>
+<h2 id="多个-Candidate-竞选"><a href="#多个-Candidate-竞选" class="headerlink" title="多个 Candidate 竞选"></a>多个 Candidate 竞选</h2><ul>
+<li>如果有多个 Follower 成为 Candidate，并且所获得票数相同，那么就需要重新开始投票。例如下图中 Node B和 Node D 都获得两票，需要重新开始投票。  </li>
+</ul>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593936003(1).png" alt="">  </p>
+<ul>
+<li>由于每个节点设置的随机竞选超时时间不同，因此下一次再次出现多个 Candidate 并获得同样票数的概率很低。  </li>
+</ul>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593936050(1).png" alt="">  </p>
+<h2 id="数据同步"><a href="#数据同步" class="headerlink" title="数据同步"></a>数据同步</h2><ul>
+<li><p>来自客户端的修改都会被传入 Leader。注意该修改还未被提交，只是写入日志中。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593936097(1).png" alt="">  </p>
+</li>
+<li><p>Leader 会把修改复制到所有 Follower。  </p>
+</li>
+</ul>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593936326(1).png" alt="">  </p>
+<ul>
+<li>Leader 会等待大多数的 Follower 也进行了修改，然后才将修改提交。  </li>
+</ul>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593936784(1).png" alt="">  </p>
+<ul>
+<li>此时 Leader 会通知的所有 Follower 让它们也提交修改，此时所有节点的值达成一致。  </li>
+<li><img src="https://gitee.com/guoer03/picimg/raw/master/1593936833(1).png" alt="">  </li>
+</ul>
+<p>更详细的看这个链接：<a href="https://blog.csdn.net/daaikuaichuan/article/details/98627822" target="_blank" rel="noopener">https://blog.csdn.net/daaikuaichuan/article/details/98627822</a><br><br><br><br></p>
+<hr>
+<h1 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h1><h2 id="一-负载均衡"><a href="#一-负载均衡" class="headerlink" title="一.负载均衡"></a>一.负载均衡</h2><p>集群中的应用服务器（节点）通常被设计成无状态，用户可以请求任何一个节点。</p>
+<p>负载均衡器会根据集群中每个节点的负载情况，将用户请求转发到合适的节点上。</p>
+<p>负载均衡器可以用来实现高可用以及伸缩性：</p>
+<ul>
+<li>高可用：当某个节点故障时，负载均衡器会将用户请求转发到另外的节点上，从而保证所有服务持续可用；</li>
+<li>伸缩性：算法在处理各种规模的数据时都有很好的性能。随着数据的增大,效率不会下降很快。</li>
+</ul>
+<p>负载均衡器运行过程包含两个部分：  </p>
+<ol>
+<li><p>根据负载均衡算法得到转发的节点；  </p>
+</li>
+<li><p>进行转发</p>
+<h3 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h3></li>
+</ol>
+<p><strong>1. 轮询（Round Robin）</strong><br>轮询算法把每个请求轮流发送到每个服务器上。</p>
+<p>下图中，一共有 6 个客户端产生了 6 个请求，这 6 个请求按 (1, 2, 3, 4, 5, 6) 的顺序发送。(1, 3, 5) 的请求会被发送到<br>服务器 1，(2, 4, 6) 的请求会被发送到服务器 2。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593937770(1).png" alt=""> </p>
+<p>该算法比较适合每个服务器的性能差不多的场景，如果有性能存在差异的情况下，那么性能较差的服务器可能无法承<br>担过大的负载（下图的 Server 2）。  </p>
+<p><img src="https://gitee.com/guoer03/picimg/raw/master/1593937822(1).png" alt="">  </p>
+<p><strong>2.加权轮询（Weighted Round Robbin）</strong><br>加权轮询是在轮询的基础上，根据服务器的性能差异，为服务器赋予一定的权值，性能高的服务器分配更高的权值。  </p>
+<p>例如下图中，服务器 1 被赋予的权值为 5，服务器 2 被赋予的权值为 1，那么 (1, 2, 3, 4, 5) 请求会被发送到服务器<br>1，(6) 请求会被发送到服务器 2。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593938283(1).png" alt=""><br><strong>3. 最少连接（least Connections）</strong><br>由于每个请求的连接时间不一样，使用轮询或者加权轮询算法的话，可能会让一台服务器当前连接数过大，而另一台<br>服务器的连接过小，造成负载不均衡。  </p>
+<p>例如下图中，(1, 3, 5) 请求会被发送到服务器 1，但是 (1, 3) 很快就断开连接，此时只有 (5) 请求连接服务器 1；(2, 4,<br>6) 请求被发送到服务器 2，只有 (2) 的连接断开，此时 (6, 4) 请求连接服务器 2。该系统继续运行时，服务器 2 会承<br>担过大的负载。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593938396(1).png" alt=""><br>最少连接算法就是将请求发送给当前最少连接数的服务器上。<br>例如下图中，服务器 1 当前连接数最小，那么新到来的请求 6 就会被发送到服务器 1 上。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593938469(1).png" alt=""><br><strong>4. 加权最少连接（Weighted Least Connection）</strong>  </p>
+<p>在最少连接的基础上，根据服务器的性能为每台服务器分配权重，再根据权重计算出每台服务器能处理的连接数。  </p>
+<p><strong>5. 随机算法（Random）</strong>  </p>
+<p>把请求随机发送到服务器上。<br>和轮询算法类似，该算法比较适合<strong>服务器性能差不多</strong>的场景。<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593938584(1).png" alt=""><br><strong>6. 源地址哈希法 (IP Hash)</strong>  </p>
+<p>源地址哈希通过对客户端 IP 计算哈希值之后，再对服务器数量取模得到目标服务器的序号。  </p>
+<p>可以保证同一 IP 的客户端的请求会转发到同一台服务器上，用来实现会话粘滞（Sticky Session）<br><img src="https://gitee.com/guoer03/picimg/raw/master/1593939077(1).png" alt="">  </p>
+<h3 id="转发实现"><a href="#转发实现" class="headerlink" title="转发实现"></a>转发实现</h3><p><strong>1. HTTP 重定向</strong>  </p>
+<p>负载均衡服务器使用某种负载均衡算法计算得到服务器的 IP 地址之后，将该地址写入 HTTP 重定向报文<br>中，状态码为 302。客户端收到重定向报文之后，需要重新向服务器发起请求。  </p>
+<p>缺点：  </p>
+<ul>
+<li>需要两次请求，因此访问延迟比较高；  </li>
+<li>HTTP 负载均衡器处理能力有限，会限制集群的规模。  </li>
+</ul>
+<p>该负载均衡转发的缺点比较明显，实际场景中很少使用它。<br><strong>2. DNS 域名解析</strong><br>在 DNS 解析域名的同时使用负载均衡算法计算服务器 IP 地址。每次域名解析请求都会根据对应的负载均衡算法计算出一个不同的IP地址并返回，这样A记录中配置多个服务器就可以构成一个集群，并可以实现负载均衡。下图中，用户请求<a href="http://www.apusapp.com，DNS根据A记录和负载均衡算法计算得到一个IP地址114.100.20.203，并返回给浏览器，浏览器根据该IP地址，访问真实的物理服务器114.100.20.203。所有这些操作对用户来说都是透明的，用户可能只知道www.apusapp.com这个域名。" target="_blank" rel="noopener">www.apusapp.com，DNS根据A记录和负载均衡算法计算得到一个IP地址114.100.20.203，并返回给浏览器，浏览器根据该IP地址，访问真实的物理服务器114.100.20.203。所有这些操作对用户来说都是透明的，用户可能只知道www.apusapp.com这个域名。</a><br><img src="https://gitee.com/guoer03/picimg/raw/master/20200705171807.png" alt="">  </p>
+<p>优点：  </p>
+<p>DNS 能够根据地理位置进行域名解析，返回离用户最近的服务器 IP 地址。<br>将负载均衡的工作交给DNS，省去了网站管理维护负载均衡服务器的麻烦。 </p>
+<p>缺点： </p>
+<p>由于 DNS 具有多级结构，每一级的域名记录都可能被缓存，当下线一台服务器需要修改 DNS 记录时，需要过<br>很长一段时间才能生效。    </p>
+<p>大型网站基本使用了 DNS 做为第一级负载均衡手段，即域名解析得到的一组服务器并不是实际提供服务的物理服务器，而是同样提供负载均衡服务器的内部服务器，这组内部负载均衡服务器再进行负载均衡，请请求发到真实的服务器上，最终完成请求。  </p>
+<p><strong>3. 反向代理服务器</strong>  </p>
+<p>反向代理服务器位于源服务器前面，用户的请求需要先经过反向代理服务器才能到达源服务器。反向代理可以用来进行缓存、日志记录等，同时也可以用来做为负载均衡服务器。   </p>
+<p> <img src="https://gitee.com/guoer03/picimg/raw/master/20200705173157.png" alt=""><br>在这种负载均衡转发方式下，客户端不直接请求源服务器，因此源服务器不需要外部 IP 地址，而反向代理需要配置内部和外部两套 IP 地址。  </p>
+<p>优点：<br>与其它功能集成在一起，部署简单。<br>缺点：<br>所有请求和响应都需要经过反向代理服务器，它可能会成为性能瓶颈。<br><strong>4. 网络层</strong>  </p>
+<p>在操作系统内核进程获取网络数据包，根据负载均衡算法计算源服务器的 IP 地址，并修改请求数据包的目的 IP 地址，最后进行转发。  </p>
+<p>源服务器返回的响应也需要经过负载均衡服务器，通常是让负载均衡服务器同时作为集群的网关服务器来实现。  </p>
+<p>优点：<br>在内核进程中进行处理，性能比较高。  </p>
+<p>缺点：<br>和反向代理一样，所有的请求和响应都经过负载均衡服务器，会成为性能瓶颈。<br><strong>5. 链路层</strong><br>在链路层根据负载均衡算法计算源服务器的 MAC 地址，并修改请求数据包的目的 MAC 地址，并进行转发。<br>通过配置源服务器的虚拟 IP 地址和负载均衡服务器的 IP 地址一致，从而不需要修改 IP 地址就可以进行转发。也正因为 IP 地址一样，所以源服务器的响应不需要转发回负载均衡服务器，可以直接转发给客户端，避免了负载均衡服务器的成为瓶颈。  </p>
+<p>这是一种三角传输模式，被称为直接路由。对于提供下载和视频服务的网站来说，直接路由避免了大量的网络传输数据经过负载均衡服务器。  </p>
+<h2 id="二-集群下的Session管理"><a href="#二-集群下的Session管理" class="headerlink" title="二.集群下的Session管理"></a>二.集群下的Session管理</h2>
   </article>
 </div>
 
